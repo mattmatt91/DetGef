@@ -1,0 +1,95 @@
+{
+    "0": {
+        "name": "heating up",
+        "duration": {
+            "unit": "s",
+            "value": 5
+        },
+        "voltage": {
+            "unit": "V",
+            "value": 1
+        },
+        "power": {
+            "unit": "W",
+            "value": 100
+        },
+        "current": {
+            "unit": "A",
+            "value": 0.2
+        },
+        "flow": {
+            "unit": "l/min",
+            "value": 0.4
+        },
+        "samplingrate": {
+            "unit": "Hz",
+            "value": 1
+        },
+        "H2": {
+            "unit": "ppm",
+            "value": 10
+        }
+    },
+    "1": {
+        "name": "testing sensor1",
+        "duration": {
+            "unit": "s",
+            "value": 5
+        },
+        "voltage": {
+            "unit": "V",
+            "value": 2
+        },
+        "power": {
+            "unit": "W",
+            "value": 100
+        },
+        "current": {
+            "unit": "A",
+            "value": 0.2
+        },
+        "flow": {
+            "unit": "l/min",
+            "value": 0.4
+        },
+        "samplingrate": {
+            "unit": "Hz",
+            "value": 1
+        },
+        "H2": {
+            "unit": "ppm",
+            "value": 120
+        }
+    },
+    "2": {
+        "name": "test sequence 2",
+        "duration": {
+            "unit": "s",
+            "value": 7
+        },
+        "voltage": {
+            "unit": "V",
+            "value": 1.5
+        },
+        "current": {
+            "unit": "A",
+            "value": 0.4
+        },
+        "power": {
+            "unit": "W",
+            "value": 100
+        },
+        "flow": {
+            "unit": "l/min",
+            "value": 0.5
+        },
+        "samplingrate": {
+            "unit": "Hz",
+            "value": 1
+        },
+        "H2": {
+            "unit": "ppm",
+            "value": 100
+        }
+    }
+}
