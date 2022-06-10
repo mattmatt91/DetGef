@@ -3,25 +3,25 @@ from time import sleep
 from pandas import json_normalize
 
 
-port = 'COM12'
+port = 'COM4'
 ppm0_H2 = 1000
 cnls = {"air_dry":
         {"cnl": 1,
          "flow_max": 500,
          "flow_min": 500*0.05,
-         "correction_factor": 1,
+         "correction_factor": 10,
          },
         "air_wet":
             {"cnl": 2,
              "flow_max": 500,
              "flow_min": 500*0.05,
-             "correction_factor": 1,
+             "correction_factor": 10,
              },
             "H2":
             {"cnl": 3,
              "flow_max": 20,
              "flow_min": 20*0.05,
-             "correction_factor": 2,
+             "correction_factor": 20,
              },
         }
 
@@ -58,18 +58,20 @@ class Gas():
 
     # set
     def set_gfc(self, cnl, factor):  # values between 10 and 180, set flow for cnl
-        self.ser.write(self.convert_to_ascii(f'GC{cnl}{factor}\r'))
-        if self.get_gasfactor(cnl) != factor:  # check if value has benn set
-            raise f'Failed to set gasfactor correction for cnl {cnl}'
+        _cnl = self.cnls[cnl]['cnl']
+        self.ser.write(self.convert_to_ascii(f'GC{_cnl}{factor}\r'))
+        if self.get_gfc(cnl) != factor:  # check if value has benn set
+            print(f'Failed to set gasfactor correction for cnl {cnl}')
 
     def set_gfc_all_cnl(self):
         for cnl in self.cnls:
             self.set_gfc(cnl, self.cnls[cnl]['correction_factor'])
 
     def set_flow_cnl(self, cnl, flow):  # values between 0 and 1000, set flow for cnl
-        self.ser.write(self.convert_to_ascii(f'FS{cnl} {flow}\r\n'))
+        _cnl = self.cnls[cnl]['cnl']
+        self.ser.write(self.convert_to_ascii(f'FS{_cnl} {flow}\r\n'))
         if self.get_flow_set(cnl) != flow:  # check if value has benn set
-            raise f'Failed to set flow for cnl {cnl}'
+            print(f'Failed to set flow for cnl {cnl}')
 
     def set_flow_ppm(self, flow, ppm):  # set the global flow and ppn of analyt
         self.flow = flow
@@ -79,16 +81,22 @@ class Gas():
         proportionDry = 1 - proportionH2 - proportionWet
         proportions = {'air_dry': proportionDry,
                        'air_wet': proportionWet, 'H2': proportionH2}
+        print(proportions)
         mapped_values = self.proportions_to_promil(proportions)
+        print(mapped_values)
+        exit()
         for cnl in self.cnls:
-            self.set_flow_cnl(self.cnls[cnl]['cnl'], mapped_values[cnl])
+
+            self.set_flow_cnl(cnl, mapped_values[cnl])
 
     # valves
     def open_valve_cnl(self, cnl):  # set flow for cnl
-        self.ser.write(self.convert_to_ascii(f'ON{cnl}\r\n'))
+        _cnl = self.cnls[cnl]['cnl']
+        self.ser.write(self.convert_to_ascii(f'ON{_cnl}\r\n'))
 
     def close_valve_cnl(self, cnl):  # , set flow for cnl
-        self.ser.write(self.convert_to_ascii(f'OF{cnl}\r\n'))
+        _cnl = self.cnls[cnl]['cnl']
+        self.ser.write(self.convert_to_ascii(f'OF{_cnl}\r\n'))
 
     def open_all_valves(self):
         for cnl in self.cnls:
@@ -100,26 +108,26 @@ class Gas():
 
     # get
     def get_flow_set(self, cnl):
-        self.ser.write(self.convert_to_ascii(f'FS{cnl}R\r\n'))
-        response = self.byteslist_to_float(
-            self.ser.readlines().decode("utf-8"))
+        _cnl = self.cnls[cnl]['cnl']
+        self.ser.write(self.convert_to_ascii(f'FS{_cnl}R\r\n'))
+        response = self.byteslist_to_float(self.ser.readlines())
         # does this function work well?
         value = (response/1000) * self.cnls[cnl]['flow_max']
         return value
 
     def get_flow_act(self, cnl):  # returns the actual concentraion
         # check which format is returned !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        self.ser.write(self.convert_to_ascii(f'FL{cnl}\r\n'))
-        response = self.byteslist_to_float(
-            self.ser.readlines().decode("utf-8"))
+        _cnl = self.cnls[cnl]['cnl']
+        self.ser.write(self.convert_to_ascii(f'FL{_cnl}\r\n'))
+        response = self.byteslist_to_float(self.ser.readlines())
         # does this function work well?
         value = (response/1000) * self.cnls[cnl]['flow_max']
         return value
 
     def get_gfc(self, cnl):
-        self.ser.write(self.convert_to_ascii(f'GC{cnl}R\r\n'))
-        response = self.byteslist_to_float(
-            self.ser.readlines().decode("utf-8"))
+        _cnl = self.cnls[cnl]['cnl']
+        self.ser.write(self.convert_to_ascii(f'GC{_cnl}R\r\n'))
+        response = self.byteslist_to_float(self.ser.readlines())
         return response
 
     def get_flow_set_all_cnls(self):
@@ -168,7 +176,9 @@ class Gas():
 
     @staticmethod
     def convert_to_ascii(text):
+        print(text)
         ascii = [ord(i) for i in text]
+        print(ascii)
         return ascii
 
     @staticmethod
@@ -181,15 +191,14 @@ class Gas():
 
 if __name__ == '__main__':
     gas = Gas(port)
-
-    gas.set_flow_cnl_ppm(flow=80, ppm=50)
-    gas.open_all_valves()
-    for i in range(10):
-        print(gas.get_data())
-        sleep(1)
-    gas.set_flow_cnl_ppm(flow=80, ppm=30)
-    for i in range(10):
-        print(gas.get_data())
-        sleep(1)
-    gas.close_all_valves(1)
-    gas.close()
+    gas.set_flow_ppm(flow=80, ppm=1000)
+    # gas.open_all_valves()
+    # for i in range(10):
+    #     print(gas.get_data())
+    #     sleep(1)
+    # gas.set_flow_cnl_ppm(flow=80, ppm=30)
+    # for i in range(10):
+    #     print(gas.get_data())
+    #     sleep(1)
+    # gas.close_all_valves(1)
+    # gas.close()
