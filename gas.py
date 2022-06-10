@@ -180,7 +180,7 @@ class Gas():
 
 
 if __name__ == '__main__':
-    gas = Gas(port, 1000)
+    gas = Gas(port)
 
     gas.set_flow_cnl_ppm(flow=80, ppm=50)
     gas.open_all_valves()
