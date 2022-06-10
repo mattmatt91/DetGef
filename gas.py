@@ -150,6 +150,9 @@ class Gas():
                 orient='records')[0]  # prüfen warum indix
             return response
 
+    def get_cnl_number(self, cnl):
+        return self.cnls[cnl]['cnl']
+
     # calculate flows
     # convert proportions of gas  mapped values for mixer:
     def proportions_to_promil(self, proportions):
