@@ -1,10 +1,9 @@
-test = True
 
-if not test:
-    from multimeter import Multimeter
-    from powersupply import PowerSupply
-    from gas import Gas
-import not_GUI
+
+from multimeter import Multimeter
+from powersupply import PowerSupply
+
+
 from outro import doit
 from os.path import join
 import json
@@ -18,86 +17,63 @@ program_path = 'test_program1.json'
 programs_defaultpath = 'programs'
 default_data_path = 'data'
 
-address_gas = ''
+
 address_powersupply = 'ASRL11::INSTR'
-address_multimeter = 'USB0::0x05E6::0x6500::04517856::INSTR'
-PORT_gas = 'COM12'
+# address_multimeter = 'USB0::0x05E6::0x6500::04517856::INSTR'
+address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
 
 buffer_size = 5
 
 
-class Dummy():
-    def __init__(self):
-        pass
-
-    def get_data(self):
-    
-        return {'dummy1': 1, 'dummy2': 2.5, 'dummy3': 1, 'dummy4': 2.5, 'dummy5': 5, 'dummy6': 2.5}
-
-    def close(self):
-        return False
 
 class Experiment():
     def __init__(self):
-        if test:
-            dummy = Dummy()
-            self.devices = {"dummy": dummy}
-        else:
-            powersupply = PowerSupply(address_powersupply)
-            gas = Gas(address_gas)
-            multimeter = Multimeter(address_multimeter)
-            self.devices = {"gas": gas, "powersupply": powersupply,
-                        "multimeter": multimeter}
-            self.devices = { "multimeter":multimeter, "powersupply":powersupply}
-            self.devices = {"powersupply":powersupply}
-            self.devices = {"dummy":Dummy()}
+        # define defices and create instances of classes
+        powersupply = PowerSupply(address_powersupply)
+        multimeter = Multimeter(address_multimeter)
+        multimeter.set_resistance()
+        self.devices = {"powersupply": powersupply, "multimeter": multimeter}
+
         self.buffer_size = buffer_size  # change for experiments
         self.read_program()
+ 
+    
         _name = program_path[:program_path.find(
             '.json')] + datetime.now().strftime("_%m-%d-%Y_%H-%M-%S")
         self.data_path = join(default_data_path, _name)
         Path(self.data_path).mkdir(parents=True, exist_ok=True)
         _name = f"results_{datetime.now().strftime('%m_%d_%Y %H-%M-%S')}.csv"
         self.file_entire_path = join(self.data_path, _name)
-        self.bar = not_GUI.Console_monitor(self.program)
+
 
     def start(self):
         self.start_time = datetime.now()
         self.data_entire = []
         for step_id in self.program:
             self.step_id = step_id
-            self.bar.new_program(self.step_id)
-            self.set_parameters()
+            self.set_parameters() #######################hier weiter machen!!!!!!
             self.step_loop()
         self.close_devices()
         doit()
+    
 
     def close_devices(self):
-        if test:
-            self.devices['dummy'].close()
-        else:
-            for device in self.devices:
-                self.devices[device].close()
+        for device in self.devices:
+            self.devices[device].close()
 
     def set_parameters(self):
-        if test:
-            pass
-        else:
-            # powersupply
-            self.devices['powersupply'].set_voltage(
-                self.program[self.step_id]['voltage']['value'])
-            self.devices['powersupply'].set_current(
-                self.program[self.step_id]['current']['value'])
-            self.devices['powersupply'].set_power(
-                self.program[self.step_id]['power']['value'])
-            self.devices['powersupply'].supply_on()
 
-            # multimeter
+        # powersupply
+        self.devices['powersupply'].set_voltage(
+            self.program[self.step_id]['voltage']['value'])
+        self.devices['powersupply'].set_current(
+            self.program[self.step_id]['current']['value'])
+        self.devices['powersupply'].set_power(
+            self.program[self.step_id]['power']['value'])
+        self.devices['powersupply'].supply_on()
 
-            # gas
-            self.devices['gas'].set_flow_ppm(
-                self.program[self.step_id]['flow'], self.program[self.step_id]['flow'])
-            self.devices['gas'].open_all_valves()
+        # multimeter
+
 
     def step_loop(self):
         self.i = 0
@@ -111,7 +87,6 @@ class Experiment():
         self.data = []
         while datetime.now() <= self.step_start_time + timedelta(seconds=self.program[self.step_id]['duration']['value']):
             self.get_data()
-            self.bar.update(self.latest_data)
         self.save_data(last=True)
 
     def get_data(self):
@@ -121,14 +96,9 @@ class Experiment():
             self.last_fetched = this_time
             self.latest_data = {'id': self.program[self.step_id]['name'], 'time': datetime.now().strftime('%m_%d_%Y %H-%M-%S'),
                                 'timestamp': round_time(str(datetime.now() - self.step_start_time), 2)}
-            # self.latest_data.update(self.devices['powersupply'].get_data())
-            # self.latest_data.update(self.devices['multimeter'].get_data())
-            # self.latest_data.update(self.devices['dummy'].get_data())
-            if test:
-                self.latest_data.update(self.devices['dummy'].get_data())
-            else:
-                for device in self.devices:
-                    self.latest_data.update(self.devices[device].get_data())
+            self.latest_data.update(self.devices['powersupply'].get_data())
+            self.latest_data.update(self.devices['multimeter'].get_data())
+            
 
             self.data.append(self.latest_data)
             self.data_entire.append(self.latest_data)

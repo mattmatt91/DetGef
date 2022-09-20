@@ -13,7 +13,6 @@ class Multimeter():
         self.get_identity()
         self.reset()
         self.set_SCPI()
-        self.set_DC()
 
     def get_identity(self):
         print(cf.RED, self.client.query("*IDN?"),cf.RESET)
@@ -25,16 +24,23 @@ class Multimeter():
     def reset(self):
         self.client.write('*RST')
         
-        
-    def set_DC(self):
+    def set_voltage_DC(self):
         self.client.write("SENS:FUNC 'VOLT:DC'")
 
-    def read_voltage(self): 
+    def read_value(self): 
         return float(self.client.query(":READ?"))
     
+    def set_resistance(self): # set multimeter to measure resistance
+        self.client.write("SENS:FUNC 'RES'")
+
+
+    def set_resistance(self): # set multimeter to measure resistance
+        self.client.write("SENS:FUNC 'RES'")
+        return float(self.client.query(":READ?"))
+
     def get_data(self):
         data = {}
-        data['voltage_multimeter'] = self.read_voltage()
+        data['voltage_multimeter'] = self.read_value()
         return data
 
     def close(self):
@@ -42,10 +48,11 @@ class Multimeter():
 
 
 if __name__ == '__main__':
-    # multimeter = Multimeter('USB0::0x05E6::0x6500::04517856::INSTR')
-    multimeter = Multimeter('USB0::0x05E6::0x6500::04517856::INSTR')
+    multimeter = Multimeter('USB0::0x05E6::0x6500::04544803::INSTR')
+    multimeter.set_resistance()
     sleep(1)
     for i in range(10):
-        multimeter.read_voltage()
+        print(multimeter.read_value())
+
         sleep(0.5)
     

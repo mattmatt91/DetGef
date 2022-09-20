@@ -1,7 +1,6 @@
 
 from multimeter import Multimeter
-# from powersupply import PowerSupply
-# from gas import Gas
+from powersupply import PowerSupply
 import not_GUI 
 
 from os.path import join
@@ -18,20 +17,18 @@ program_path = 'test_program1.json'
 programs_defaultpath = 'programs' 
 default_data_path = 'data'
 
-address_gas = ''
-address_powersupply = ''
-address_multimeter = 'USB0::0x05E6::0x6500::04517856::INSTR'
 
 
-# gas = Gas(address_gas)
-# powersupply = Powersupply(address_powersupply)
+# address_multimeter = 'USB0::0x05E6::0x6500::04517856::INSTR'
+address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
+
+
+powersupply = PowerSupply(address_powersupply)
 multimeter = Multimeter(address_multimeter)
 
 class Experiment():
-    def __init__(self, powersupply, multimeter, gas, dummy):
-        # self.devices = {"gas":gas, "powersupply": powersupply, "multimeter":multimeter}
-        self.devices = { "multimeter":multimeter}
-        self.devices = {'dummy':dummy}
+    def __init__(self, powersupply, multimeter, gas):
+        self.devices = {"powersupply": powersupply, "multimeter":multimeter}
         self.read_program()
         _name = program_path[:program_path.find('.json')] + datetime.now().strftime("_%m-%d-%Y_%H-%M-%S")
         self.data_path = join(default_data_path, _name)
@@ -74,11 +71,11 @@ class Experiment():
 
     def get_data(self):
         this_time = datetime.now()
-        if this_time >= self.last
-        data = {'time': this_time.strftime('%m_%d_%Y %H-%M-%S'), 'timestamp': (this_time- self.step_start_time).strftime('%m_%d_%Y %H-%M-%S')}
-        for device in self.devices:
-            data.update(self.devices[device].get_data())
-        self.data.append(data)
+        if this_time >= self.last:
+            data = {'time': this_time.strftime('%m_%d_%Y %H-%M-%S'), 'timestamp': (this_time- self.step_start_time).strftime('%m_%d_%Y %H-%M-%S')}
+            for device in self.devices:
+                data.update(self.devices[device].get_data())
+            self.data.append(data)
                 
     
     def save_data(self):
@@ -114,7 +111,8 @@ class Experiment():
 
 
 if __name__ == '__main__':
-    experiment = Experiment('powersupply', multimeter, 'gas', )
+
+    experiment = Experiment(powersupply, multimeter)
     experiment.start()
 
   
