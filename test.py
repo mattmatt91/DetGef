@@ -7,11 +7,12 @@
 import asyncio
 from mfc import FlowController
 
-
-
 async def get():
-    async with FlowController('169.254.2.100') as fc:
+    async with FlowController('192.168.2.100') as fc:
         print(await fc.get())
 
 asyncio.run(get())
-# dsfgsdfgsdfgdfsdf
+asyncio.run(set(10))
+
+
+### 1000 ccm ---> factor for volume <---
