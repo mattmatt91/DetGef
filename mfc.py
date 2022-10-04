@@ -1,40 +1,6 @@
-Skip to content
-Product
-Solutions
-Open Source
-Pricing
-Search
-Sign in
-Sign up
-mattmatt91
-/
-DetGef
-Public
-Code
-Issues
-Pull requests
-Actions
-Projects
-Security
-Insights
-DetGef/mfc.py /
-@mattmatt91
-mattmatt91 Add files via upload
-Latest commit 0b5af33 4 days ago
- History
- 1 contributor
-132 lines (93 sloc)  3.7 KB
-
-from distutils.log import debug
-from msilib.schema import Error
-from urllib import response
 from pyModbusTCP.client import ModbusClient # Modbus TCP Client
-from pyModbusTCP import utils 
 import struct
 import os, time
-from ast import literal_eval
-import converters
-
 
 
 
