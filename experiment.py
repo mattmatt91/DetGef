@@ -2,6 +2,7 @@
 
 from multimeter import Multimeter
 from powersupply import PowerSupply
+from mfc import MFC
 
 
 from outro import doit
@@ -19,8 +20,11 @@ default_data_path = 'data'
 
 
 address_powersupply = 'ASRL11::INSTR'
-# address_multimeter = 'USB0::0x05E6::0x6500::04517856::INSTR'
 address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
+
+mfc_ip="192.168.2.100"
+mfc_port=502
+mfc_max_flow = 1000
 
 buffer_size = 5
 
@@ -32,7 +36,9 @@ class Experiment():
         powersupply = PowerSupply(address_powersupply)
         multimeter = Multimeter(address_multimeter)
         multimeter.set_resistance()
-        self.devices = {"powersupply": powersupply, "multimeter": multimeter}
+        mfc = MFC(mfc_ip, mfc_port, mfc_max_flow)
+        mfc.open_valve(1)
+        self.devices = {"powersupply": powersupply, "multimeter": multimeter, "mfc": mfc}
 
         self.buffer_size = buffer_size  # change for experiments
         self.read_program()
@@ -53,6 +59,7 @@ class Experiment():
             self.step_id = step_id
             self.set_parameters() #######################hier weiter machen!!!!!!
             self.step_loop()
+        self.devices['mfc'].open_valve(0)
         self.close_devices()
         doit()
     
@@ -62,8 +69,8 @@ class Experiment():
             self.devices[device].close()
 
     def set_parameters(self):
-
         # powersupply
+        print(self.program[self.step_id])
         self.devices['powersupply'].set_voltage(
             self.program[self.step_id]['voltage']['value'])
         self.devices['powersupply'].set_current(
@@ -71,8 +78,11 @@ class Experiment():
         self.devices['powersupply'].set_power(
             self.program[self.step_id]['power']['value'])
         self.devices['powersupply'].supply_on()
-
+        
         # multimeter
+
+        # mfc
+        self.devices['mfc'].set_point(self.program[self.step_id]['flow']['value']*100) # set absoilute flow in sccm
 
 
     def step_loop(self):
@@ -98,6 +108,7 @@ class Experiment():
                                 'timestamp': round_time(str(datetime.now() - self.step_start_time), 2)}
             self.latest_data.update(self.devices['powersupply'].get_data())
             self.latest_data.update(self.devices['multimeter'].get_data())
+            self.latest_data.update(self.devices['mfc'].get_data())
             
 
             self.data.append(self.latest_data)

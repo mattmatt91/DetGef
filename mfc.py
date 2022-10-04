@@ -81,6 +81,20 @@ class MFC():
         flo_rel = flo/self.max_flow
         data = float_to_ints(flo_rel)
         self.bus.write_multiple_registers(int('0xA000', 16), data)
+
+    def get_data(self):
+        temp = self.get_temp()
+        flow = self.get_flow()
+        flow_total = self.get_flow_total()
+        valve_state = self.valve_state()
+        point = self.get_point()
+        valve_pos = self.get_valve_pos()
+        data = {'temp': temp, 'flow': flow, 'flow_total': flow_total, 
+            'valve_state': valve_state, 'point': point, 'valve_pos': valve_pos}
+        return data
+    
+    def close(self):
+        self.bus.close()
     
 
 
