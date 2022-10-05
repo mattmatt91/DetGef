@@ -8,9 +8,9 @@ class Multimeter():
     def __init__(self, address):
         rm = pyvisa.ResourceManager()
         # print(rm.list_resources())
-        print(cf.GREEN,"init multimeter", cf.RESET)
+        # print(cf.GREEN,"init multimeter", cf.RESET)
         self.client =  rm.open_resource(address)
-        self.get_identity()
+        # self.get_identity()
         self.reset()
         self.set_SCPI()
 
@@ -19,7 +19,7 @@ class Multimeter():
 
     def set_SCPI(self):
         self.client.write('*LANG SCPI')
-        print('using: ', cf.RED, self.client.query("*LANG?"), cf.RESET)
+        # print('using: ', cf.RED, self.client.query("*LANG?"), cf.RESET)
         
     def reset(self):
         self.client.write('*RST')

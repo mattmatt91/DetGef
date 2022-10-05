@@ -10,11 +10,11 @@ class PowerSupply():
     def __init__(self, address):
         rm = pyvisa.ResourceManager()
         rm.list_resources()
-        print(colorama.Fore.GREEN, 'init powersupply')
-        print(colorama.Fore.RESET)
+        # print(colorama.Fore.GREEN, 'init powersupply')
+        # print(colorama.Fore.RESET)
         self.client =  rm.open_resource(address)
         self.reset()
-        self.get_info()
+        # self.get_info()
 
 
     def reset(self):

@@ -70,7 +70,8 @@ class Experiment():
 
     def set_parameters(self):
         # powersupply
-        print(self.program[self.step_id])
+        print('test')
+        print(json.dumps(self.program[self.step_id], indent=4))
         self.devices['powersupply'].set_voltage(
             self.program[self.step_id]['voltage']['value'])
         self.devices['powersupply'].set_current(

@@ -26,7 +26,7 @@
             "value": 1
         },
         "H2": {
-            "unit": "ppm",
+            "unit": "l/min",
             "value": 10
         }
     },
