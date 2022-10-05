@@ -1,10 +1,6 @@
-
-
 from multimeter import Multimeter
 from powersupply import PowerSupply
 from mfc import MFC
-
-
 from outro import doit
 from os.path import join
 import json
@@ -21,11 +17,9 @@ default_data_path = 'data'
 
 address_powersupply = 'ASRL11::INSTR'
 address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
-
 mfc_ip = "192.168.2.100"
 mfc_port = 502
 mfc_max_flow = 1000
-
 buffer_size = 5
 
 

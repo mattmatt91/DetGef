@@ -3,7 +3,7 @@
         "name": "heating up",
         "duration": {
             "unit": "s",
-            "value": 5
+            "value": 100
         },
         "voltage": {
             "unit": "V",
@@ -34,7 +34,7 @@
         "name": "testing sensor1",
         "duration": {
             "unit": "s",
-            "value": 5
+            "value": 80
         },
         "voltage": {
             "unit": "V",
@@ -65,7 +65,7 @@
         "name": "test sequence 2",
         "duration": {
             "unit": "s",
-            "value": 7
+            "value": 105
         },
         "voltage": {
             "unit": "V",
