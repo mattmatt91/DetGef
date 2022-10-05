@@ -5,11 +5,14 @@ import os, time
 
 
 def ints_to_float(arr):
-    a = arr[0].to_bytes(2, "big")
-    b = arr[1].to_bytes(2, "big")
-    arr = a+b
-    aa = bytearray(arr)
-    return(struct.unpack('>f', aa)[0])
+    try:
+        a = arr[0].to_bytes(2, "big")
+        b = arr[1].to_bytes(2, "big")
+        arr = a+b
+        aa = bytearray(arr)
+        return(struct.unpack('>f', aa)[0])
+    except:
+        return None
 
 def ints_to_long(arr):
     a = arr[0].to_bytes(2, "big")

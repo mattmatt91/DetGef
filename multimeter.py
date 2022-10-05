@@ -13,6 +13,7 @@ class Multimeter():
         # self.get_identity()
         self.reset()
         self.set_SCPI()
+        self.set_resistance()
 
     def get_identity(self):
         print(cf.RED, self.client.query("*IDN?"),cf.RESET)

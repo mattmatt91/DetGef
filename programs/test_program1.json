@@ -3,11 +3,11 @@
         "name": "heating up",
         "duration": {
             "unit": "s",
-            "value": 100
+            "value": 20
         },
         "voltage": {
             "unit": "V",
-            "value": 1
+            "value": 3.5
         },
         "power": {
             "unit": "W",
@@ -31,14 +31,14 @@
         }
     },
     "1": {
-        "name": "testing sensor1",
+        "name": "heating up",
         "duration": {
             "unit": "s",
-            "value": 80
+            "value": 13
         },
         "voltage": {
             "unit": "V",
-            "value": 2
+            "value": 3.5
         },
         "power": {
             "unit": "W",
@@ -57,39 +57,8 @@
             "value": 1
         },
         "H2": {
-            "unit": "ppm",
-            "value": 120
-        }
-    },
-    "2": {
-        "name": "test sequence 2",
-        "duration": {
-            "unit": "s",
-            "value": 105
-        },
-        "voltage": {
-            "unit": "V",
-            "value": 1.5
-        },
-        "current": {
-            "unit": "A",
-            "value": 0.4
-        },
-        "power": {
-            "unit": "W",
-            "value": 100
-        },
-        "flow": {
             "unit": "l/min",
-            "value": 0.5
-        },
-        "samplingrate": {
-            "unit": "Hz",
-            "value": 1
-        },
-        "H2": {
-            "unit": "ppm",
-            "value": 100
+            "value": 10
         }
     }
 }
