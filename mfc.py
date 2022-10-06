@@ -107,22 +107,27 @@ if __name__ == '__main__':
     max_flow = 1000
 
     mfc = MFC(host, port, max_flow)
-    # mfc.zero_flow()
-
-    # open close valve
-    mfc.open_valve(1)
-    print(mfc.valve_state())
     time.sleep(1)
-    mfc.close_valve(0)
     print(mfc.valve_state())
-    
+    print(mfc.valve_state())
     print(mfc.get_temp())
     print(mfc.get_flow())
     print(mfc.get_flow_total())
-
-    mfc.set_point(100)
     print(mfc.get_point())
     print(mfc.get_valve_pos())
+
+    i = 0
+    while True:
+        i += 1
+        mfc.set_point(i%100)
+        print(mfc.valve_state())
+        print(mfc.get_temp())
+        print(mfc.get_flow())
+        print(mfc.get_flow_total())
+        print(mfc.get_point())
+        print()
+        time.sleep(0.1)
+
 
 
 

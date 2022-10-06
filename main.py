@@ -12,7 +12,7 @@ from pathlib import Path
 import os
 
 
-program_path = 'test_program1.json'
+program_path = 'test_program.csv'
 programs_defaultpath = 'programs'
 default_data_path = 'data'
 
@@ -28,83 +28,91 @@ class Experiment():
     def __init__(self, test=False):
         self.test = test
         if self.test:
-            multimeter = TestDevice('multimeter')
-            powersupply = TestDevice('powersupply')
-            mfc = TestDevice('mfc')
+            self.multimeter = TestDevice('multimeter')
+            self.powersupply = TestDevice('powersupply')
+            self.mfc = TestDevice('mfc')
         else:
             # define defices and create instances of classes
-            powersupply = PowerSupply(address_powersupply)
-            multimeter = Multimeter(address_multimeter)
-            mfc = MFC(mfc_ip, mfc_port, mfc_max_flow)
+            self.powersupply = PowerSupply(address_powersupply)
+            self.multimeter = Multimeter(address_multimeter)
+            self.fc = MFC(mfc_ip, mfc_port, mfc_max_flow)
 
-        self.devices = {"powersupply": powersupply, "multimeter": multimeter, "mfc": mfc}
         self.buffer_size = buffer_size  # change for experiments --> number of points in buffer to wirte to file
         self.read_program()
         self.create_folder_structure()
 
     def create_folder_structure(self):
         _time = datetime.now().strftime("_%m-%d-%Y_%H-%M-%S")
-        _name = program_path[:program_path.find('.json')] + _time
-        self.data_path = join(default_data_path, _name) # path to folder with data of measurement
+        self.name = program_path[:program_path.find('.csv')] + _time
+        self.data_path = join(default_data_path, self.name) # path to folder with data of measurement
         Path(self.data_path).mkdir(parents=True, exist_ok=True)
-        _name = f"results_{_name}.csv"
-        self.file_entire_path = join(self.data_path, _name)
+        # self.file_entire_path = join(self.data_path, _name)
 
-    def read_program(self): # reading json with program
+
+    def read_program(self): # reading program as pd.df
         _path_program = join(programs_defaultpath, program_path)
-        f = open(_path_program)
-        self.program = json.load(f)
+        self.program = pd.read_csv(_path_program, decimal='.', delimiter='\t')
+        self.program.set_index('step_id', inplace=True)
         print(f'reading {program_path}')
-        f.close()
+
 
     def start(self):  # startung measurement
         self.start_time = datetime.now()
         self.data_entire = []
-        for step_id in self.program:
+        for step_id in self.program.index:
+            self.step = self.program.loc[step_id]
             print(f'starting step {step_id}')
+            print(self.step)
             self.step_id = step_id
-            print(json.dumps(self.program[self.step_id], indent=3))
-            # self.set_parameters()
-            # self.step_loop()
-
+            self.set_parameters()
+            self.step_loop()
         self.close_devices()
     
+    def set_parameters(self):  # set parameters for every step in measurement
+        if self.test:
+            # powersupply
+            self.powersupply.set_value_1(self.step['voltage [V]'])
+            self.powersupply.set_value_2(self.step['current [A]'])
+            self.powersupply.set_value_3(self.step['power [W]'])
+
+            # mfc
+            self.mfc.set_value_1(self.step['flow_total [ml/min]'])
+
+        else:
+            # powersupply
+            print('\n\n\n', self.step)
+            self.powersupply.set_voltage(self.step['voltage [V]'])
+            self.powersupply.set_current(self.step['current [A]'])
+            self.powersupply.set_power(self.step['power [W]'])
+            self.powersupply.supply_on()
+            
+            # mfc
+            self.mfc.set_point(self.step['flow_total [ml/min]'])
+
     def close_devices(self):  # close connections to all devices
-        for device in self.devices:
-            self.devices[device].close()
+        self.multimeter.close()
+        self.powersupply.close()
+        self.mfc.close()
+
+    def step_loop(self):  # loop during single steps, for saving data
+        i = 0
+        sampling_interval = timedelta(seconds=(1/(self.step['samplingrate [Hz]'])))
+        step_start_time = datetime.now()
+        last_measure = step_start_time - sampling_interval
+        step_name = self.step['step_name']
+        file_name = f'{self.name}_{step_name}.csv'
+        self.filepath = join(self.data_path, file_name)
+        print(self.filepath)
+        while datetime.now() <= step_start_time + timedelta(minutes=self.step['duration [min]']):
+            pass
+            # self.get_data()
+        # self.save_data(last=True)
 #######################################
 
 
-    def set_parameters(self):  # set parameters for every step in measurement
-        # powersupply
-        self.devices['powersupply'].set_voltage(
-            self.program[self.step_id]['voltage']['value'])
-        self.devices['powersupply'].set_current(
-            self.program[self.step_id]['current']['value'])
-        self.devices['powersupply'].set_power(
-            self.program[self.step_id]['power']['value'])
-        self.devices['powersupply'].supply_on()
-
-        # mfc
-        # set absoilute flow in sccm
-        self.devices['mfc'].set_point(
-            self.program[self.step_id]['flow']['value']*100)
 
 
 
-    def step_loop(self):  # loop during single steps, for saving data
-        self.i = 0
-        self.interval = timedelta(
-            seconds=(1/(self.program[self.step_id]['samplingrate']['value'])))
-        self.step_start_time = datetime.now()
-        self.last_fetched = self.step_start_time - self.interval
-        # creating directory
-        _name = f"step{str(self.step_id)}_{self.program[self.step_id]['name']}{datetime.now().strftime('%m_%d_%Y %H-%M-%S')}.csv"
-        self.filepath = join(self.data_path, _name)
-        self.data = []
-        while datetime.now() <= self.step_start_time + timedelta(seconds=self.program[self.step_id]['duration']['value']):
-            self.get_data()
-        self.save_data(last=True)
 
     def get_data(self): #gettung data from devices
         this_time = datetime.now()

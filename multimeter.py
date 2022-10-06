@@ -52,8 +52,8 @@ if __name__ == '__main__':
     multimeter = Multimeter('USB0::0x05E6::0x6500::04544803::INSTR')
     multimeter.set_resistance()
     sleep(1)
-    for i in range(10):
+    for i in range(1000):
         print(multimeter.read_value())
 
-        sleep(0.5)
+        sleep(0.01)
     

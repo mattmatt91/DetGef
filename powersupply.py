@@ -121,14 +121,17 @@ class PowerSupply():
 if __name__ == '__main__':
     powersupply = PowerSupply('ASRL11::INSTR')
     # powersupply = PowerSupply('ASRL5::INSTR')
-
-    powersupply.set_voltage(3)
-    powersupply.set_current(10) # was ist der senke betrieb?
-    powersupply.set_power(200)
-    powersupply.set_input_resistance(10)
-    powersupply.supply_on()
-    sleep(1)
-    print(powersupply.get_data())
-    powersupply.get_errors()
-    powersupply.get_data()
-  
+    i = 0
+    while True:
+        i += 1
+        i = i%5
+        powersupply.set_voltage(i)
+        powersupply.set_current(10) # was ist der senke betrieb?
+        powersupply.set_power(200)
+        powersupply.set_input_resistance(10)
+        powersupply.supply_on()
+        sleep(0.1)
+        print(powersupply.get_data())
+        powersupply.get_errors()
+        powersupply.get_data()
+    
