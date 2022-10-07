@@ -29,6 +29,10 @@ class TestDevice(object):
     def measure_value(self):
         return random.random_sample()
 
+    def get_data(self):
+        data = {f'{self.name}_value1': self.value_1, f'{self.name}_value2': self.value_2, f'{self.name}_value3': self.value_3, f'{self.name}_measured_value': self.measure_value()}
+        return data
+
     def close(self):
         del self 
 

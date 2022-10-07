@@ -1,0 +1,4 @@
+step_id	step_name	voltage [V]	power [W]	current [A]	flow_total [ml/min]	tanalyt_c [ppm]	samplingrate [Hz]	duration [min]
+0	heating up	2.2	1	1	500	100	10	0.10
+1	measure1	3.0	1	1	600	300	10	0.10
+2	measure2	3.1	1	1	600	300	10	.1

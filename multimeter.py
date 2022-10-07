@@ -1,7 +1,7 @@
 from turtle import color
 import pyvisa
 from time import sleep
-from colorama import Fore as cf
+
 
 
 class Multimeter():
@@ -40,9 +40,13 @@ class Multimeter():
         return float(self.client.query(":READ?"))
 
     def get_data(self):
-        data = {}
-        data['voltage_multimeter'] = self.read_value()
-        return data
+        try:
+            data = {}
+            data['resistance_multimeter_measured'] = self.read_value()
+            return data
+        except Exception as e:
+            print(f'Error reading multimeter: {e}, returning empty dict')
+            return {}
 
     def close(self):
         pass

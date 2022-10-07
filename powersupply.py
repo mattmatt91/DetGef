@@ -3,7 +3,7 @@
 
 import pyvisa
 from time import sleep
-import colorama
+
 
 
 class PowerSupply():
@@ -82,14 +82,14 @@ class PowerSupply():
 
     def get_all_set(self):
         data =  {'power_set':self.get_power_set(),
-            'current_set':self.get_current_set(),
-            'voltage_set':self.get_voltage_set()}
+            'current_set_ps':self.get_current_set(),
+            'voltage_set_ps':self.get_voltage_set()}
         return data
 
     def get_all_actual(self):
         data =  {'power_actual':self.get_power_actual(),
-        'current_actual':self.get_current_actual(),
-        'voltage_actual':self.get_voltage_actual()}
+        'current_actual_ps':self.get_current_actual(),
+        'voltage_actual_ps':self.get_voltage_actual()}
         return data
 
     def get_all_actual_arr(self):
@@ -97,8 +97,13 @@ class PowerSupply():
         return string.split(',')
 
     def get_data(self):
-        data = self.get_all_actual() | self.get_all_set()
-        return data
+        try:
+            data = self.get_all_actual() | self.get_all_set()
+            return data
+        except Exception as e:
+            print(f'Error reading powersupply: {e}, returning empty dict')
+            return {}
+
             
 
     def supply_on(self):
