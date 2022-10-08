@@ -24,7 +24,7 @@ address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
 mfc_ip = "192.168.2.100"
 mfc_port = 502
 mfc_max_flow = 1000
-buffer_size = 15
+buffer_size = 9
 update_plot = 2  # sek
 
 
@@ -81,6 +81,7 @@ class Experiment():
         df_merged = pd.concat(dfs)
         df_merged.to_csv(path_merged, decimal='.', sep='\t', index=False)
         plot_all(path_merged, test=True)
+        plot_all_measurement_line(path_merged, test=True)
 
     def set_parameters(self):  # set parameters for every step in measurement
         if self.test:
@@ -168,9 +169,7 @@ class Experiment():
                     buffer = []
                 sleep(0.05)
         self.write_to_file(buffer, flag)
-
         plot_measurement(self.filepath, test=True)
-        plot_all_measurement_line(self.filepath, test=True)
 
 
 if __name__ == '__main__':

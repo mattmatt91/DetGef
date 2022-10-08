@@ -48,7 +48,7 @@ def plot_all_measurement_line(path, test=False):
     path_fig = join(path[:path.rfind('\\')],
                     path[path.rfind('\\')+1:path.rfind('.')] + '_line.html')
     fig.write_html(path_fig)
-    # fig.show()
+    fig.show()
 
 
 def plot_all(path, test=False):
