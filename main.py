@@ -11,6 +11,7 @@ import pandas as pd
 from pathlib import Path
 import os
 from time import sleep
+from queue import Queue
 
 
 program_path = 'program.csv'
@@ -23,7 +24,7 @@ address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
 mfc_ip = "192.168.2.100"
 mfc_port = 502
 mfc_max_flow = 1000
-buffer_size = 5
+buffer_size = 15
 update_plot = 2  # sek
 
 
@@ -84,19 +85,19 @@ class Experiment():
     def set_parameters(self):  # set parameters for every step in measurement
         if self.test:
             # powersupply
-            self.powersupply.set_value_1(self.step['voltage [V]'])
-            self.powersupply.set_value_2(self.step['current [A]'])
-            self.powersupply.set_value_3(self.step['power [W]'])
+            self.powersupply.set_value_1(int(self.step['voltage [V]']))
+            self.powersupply.set_value_2(int(self.step['current [A]']))
+            self.powersupply.set_value_3(int(self.step['power [W]']))
 
             # mfc
-            self.mfc.set_value_1(self.step['flow_total [ml/min]'])
+            self.mfc.set_value_1(int(self.step['flow_total [ml/min]']))
 
         else:
             # powersupply
             print('\n\n\n', self.step)
-            self.powersupply.set_voltage(self.step['voltage [V]'])
-            self.powersupply.set_current(self.step['current [A]'])
-            self.powersupply.set_power(self.step['power [W]'])
+            self.powersupply.set_voltage(int(self.step['voltage [V]']))
+            self.powersupply.set_current(int(self.step['current [A]']))
+            self.powersupply.set_power(int(self.step['power [W]']))
             self.powersupply.supply_on()
 
             # mfc
@@ -108,6 +109,7 @@ class Experiment():
         self.mfc.close()
 
     def step_loop(self):  # loop during single steps, for saving data
+        self.out_queue = Queue()
         self.sampling_interval = timedelta(
             seconds=(1/(self.step['samplingrate [Hz]'])))
         step_name = self.step['step_name']
@@ -118,19 +120,34 @@ class Experiment():
         self.files.append(self.filepath)
         self.get_data()
 
-    def get_buffer(self):  # for live plot
-        if self.last_full_buffer == None:
-            return None
+
+    def write_to_file(self, buffer, flag=False):
+        df = pd.DataFrame(buffer)
+        if flag:
+            df.to_csv(self.filepath, sep='\t',
+                                decimal='.', index=False)
         else:
-            buf = self.last_full_buffer
-            self.last_full_buffer = None
-            return buf
+            df.to_csv(
+                self.filepath, sep='\t', decimal='.', mode='a', index=False, header=False)
+        return False
+        
+
+    def get_out_buffer(self):
+        data = []
+        while (not self.out_queue.empty()):
+            data.append(self.out_queue.get())
+        return data
+
+    def get_file_path(self):
+        return self.filepath
+
+    def kill(self):
+        exit()
 
     def get_data(self):  # gettung data from devices
         step_start_time = datetime.now()
         last_measure = step_start_time - self.sampling_interval
         buffer = []
-        self.last_full_buffer = None
         flag = True
 
         while datetime.now() <= step_start_time + timedelta(minutes=self.step['duration [min]']):
@@ -143,22 +160,15 @@ class Experiment():
                 data.update(self.powersupply.get_data())
                 data.update(self.multimeter.get_data())
                 data.update(self.mfc.get_data())
+                # putting data to buffer and queqe
+                self.out_queue.put(data)
                 buffer.append(data)
                 if len(buffer) > self.buffer_size:
-                    df_buffer = pd.DataFrame(buffer)
-                    if flag:
-                        df_buffer.to_csv(self.filepath, sep='\t',
-                                         decimal='.', index=False)
-                        flag = False
-                    else:
-                        df_buffer.to_csv(
-                            self.filepath, sep='\t', decimal='.', mode='a', index=False, header=False)
-                    self.last_full_buffer = buffer
+                    flag = self.write_to_file(buffer, flag)
                     buffer = []
-        df_buffer.to_csv(self.filepath, sep='\t', decimal='.',
-                         mode='a', index=False, header=False)
-        self.last_full_buffer = buffer
-        buffer = []
+                sleep(0.05)
+        self.write_to_file(buffer, flag)
+
         plot_measurement(self.filepath, test=True)
         plot_all_measurement_line(self.filepath, test=True)
 

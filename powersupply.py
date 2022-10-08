@@ -27,8 +27,8 @@ class PowerSupply():
 
     def get_info(self):
         string = self.client.query('*IDN?')
-        print(colorama.Fore.RED,string)
-        print(colorama.Fore.RESET)
+        print(string)
+
 
 
     def set_voltage(self, voltage):

@@ -6,9 +6,9 @@ import numpy as np
 from os.path import join
 
 
-def plot_measurement(path,test=False):
+def plot_measurement(path, test=False):
     df = pd.read_csv(path, sep='\t', decimal='.')
-    df  = sort_df_time(df, sort='time')
+    df = sort_df_time(df, sort='time')
     if not test:
         y_col = 'resistance_multimeter_measured'
     else:
@@ -23,13 +23,12 @@ def plot_measurement(path,test=False):
     path_fig = join(path[:path.rfind('\\')],
                     path[path.rfind('\\')+1:path.rfind('.')] + '.html')
     fig.write_html(path_fig)
-    fig.show()
+    # fig.show()
 
 
-def plot_all_measurement_line(path,test=False):
-    print('plotting line ##################################')
+def plot_all_measurement_line(path, test=False):
     df = pd.read_csv(path, sep='\t', decimal='.')
-    df  = sort_df_time(df, sort='time')
+    df = sort_df_time(df, sort='time')
     if not test:
         y_col = 'resistance_multimeter_measured'
     else:
@@ -49,8 +48,7 @@ def plot_all_measurement_line(path,test=False):
     path_fig = join(path[:path.rfind('\\')],
                     path[path.rfind('\\')+1:path.rfind('.')] + '_line.html')
     fig.write_html(path_fig)
-    fig.show()
-    
+    # fig.show()
 
 
 def plot_all(path, test=False):
@@ -75,7 +73,8 @@ def plot_all(path, test=False):
     path_fig = join(path[:path.rfind('\\')],
                     path[path.rfind('\\')+1:path.rfind('.')] + '.html')
     fig.write_html(path_fig)
-    fig.show()
+    # fig.show()
+
 
 def sort_df_time(df, test=False, sort='timestamp'):
     new_time = []
@@ -85,7 +84,7 @@ def sort_df_time(df, test=False, sort='timestamp'):
         else:
             new_time.append(datetime.strptime(stamp, "%H:%M:%S"))
     df['timestamp'] = [(i - new_time[0]).total_seconds() for i in new_time]
-  
+
     new_time = []
     for stamp in df['time']:
         if stamp.find('.') >= 0:
@@ -104,4 +103,4 @@ if __name__ == '__main__':
 
     path = 'data\\program_10-07-2022_17-24-38\\program_10-07-2022_17-24-38.csv'
     # plot_all(path)
-    plot_all_measurement_line(path,test=True)
+    plot_all_measurement_line(path, test=True)

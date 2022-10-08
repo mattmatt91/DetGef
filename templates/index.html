@@ -32,14 +32,14 @@
                 data: {
                     labels: [],
                     datasets: [{
-                        label: "Random Dataset",
+                        label: "Resistance [Ohm]",
                         backgroundColor: 'rgb(255, 99, 132)',
                         borderColor: 'rgb(255, 99, 132)',
                         data: [],
                         fill: false,
                     },
                     {
-                        label: "Random Dataset 2",
+                        label: "parameter 1",
                         backgroundColor: 'rgb(0, 255, 0)',
                         borderColor: 'rgb(0, 255, 0)',
                         data: [],
@@ -51,7 +51,7 @@
                     responsive: true,
                     title: {
                         display: true,
-                        text: 'Creating Real-Time Charts with Flask'
+                        text: 'MOX Sensordata'
                     },
                     tooltips: {
                         mode: 'index',
@@ -73,7 +73,7 @@
                             display: true,
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Value'
+                                labelString: 'unit'
                             }
                         }]
                     }
@@ -88,14 +88,15 @@
 
             source.onmessage = function (event) {
                 const data = JSON.parse(event.data);
+                console.log(data)
                 data.forEach(entrie => {
                     if (config.data.labels.length === 20) {
                         //config.data.labels.shift();
                         //config.data.datasets[0].data.shift();
                     }
                     config.data.labels.push(entrie.time);
-                    config.data.datasets[0].data.push(entrie.value1);
-                    config.data.datasets[1].data.push(entrie.value2);
+                    config.data.datasets[0].data.push(entrie.powersupply_measured_value);
+                    config.data.datasets[1].data.push(entrie.powersupply_value1);
                 });
                 lineChart.update();
             }
