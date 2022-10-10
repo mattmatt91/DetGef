@@ -39,7 +39,7 @@ class Experiment():
             # define defices and create instances of classes
             self.powersupply = PowerSupply(address_powersupply)
             self.multimeter = Multimeter(address_multimeter)
-            self.fc = MFC(mfc_ip, mfc_port, mfc_max_flow)
+            self.mfc = MFC(mfc_ip, mfc_port, mfc_max_flow)
 
         # change for experiments --> number of points in buffer to wirte to file
         self.buffer_size = buffer_size
@@ -80,8 +80,8 @@ class Experiment():
             dfs.append(pd.read_csv(file, decimal='.', sep='\t'))
         df_merged = pd.concat(dfs)
         df_merged.to_csv(path_merged, decimal='.', sep='\t', index=False)
-        plot_all(path_merged, test=True)
-        plot_all_measurement_line(path_merged, test=True)
+        plot_all(path_merged, test=self.test)
+        plot_all_measurement_line(path_merged, test=self.test)
 
     def set_parameters(self):  # set parameters for every step in measurement
         if self.test:
@@ -137,6 +137,7 @@ class Experiment():
         data = []
         while (not self.out_queue.empty()):
             data.append(self.out_queue.get())
+            print(data)
         return data
 
     def get_file_path(self):
@@ -161,7 +162,9 @@ class Experiment():
                 data.update(self.powersupply.get_data())
                 data.update(self.multimeter.get_data())
                 data.update(self.mfc.get_data())
+                print(data)
                 # putting data to buffer and queqe
+
                 self.out_queue.put(data)
                 buffer.append(data)
                 if len(buffer) > self.buffer_size:
@@ -173,5 +176,6 @@ class Experiment():
 
 
 if __name__ == '__main__':
-    experiment = Experiment(test=True)
+    experiment = Experiment()
+    # experiment = Experiment(test=True)
     experiment.start()
