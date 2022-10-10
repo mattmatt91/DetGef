@@ -110,7 +110,7 @@ if __name__ == '__main__':
     host="192.168.2.100"
     port=502
     max_flow = 1000
-
+    print('Start')
     mfc = MFC(host, port, max_flow)
     time.sleep(1)
     print(mfc.valve_state())
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     print(mfc.get_flow_total())
     print(mfc.get_point())
     print(mfc.get_valve_pos())
-
+    print('finished test1')
     i = 0
     while True:
         i += 1

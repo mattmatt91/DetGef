@@ -95,8 +95,8 @@
                         //config.data.datasets[0].data.shift();
                     }
                     config.data.labels.push(entrie.time);
-                    config.data.datasets[0].data.push(entrie.powersupply_measured_value);
-                    config.data.datasets[1].data.push(entrie.powersupply_value1);
+                    config.data.datasets[0].data.push(entrie.resistance_multimeter_measured);
+                    config.data.datasets[1].data.push(entrie.point);
                 });
                 lineChart.update();
             }
