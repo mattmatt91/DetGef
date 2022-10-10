@@ -53,4 +53,4 @@ def chart_data():
 if __name__ == '__main__':
     Thread(target=e.start).start()
     time.sleep(2)
-    application.run(port=2222)
+    application.run(port=2222, host="172.29.16.64")
