@@ -95,7 +95,6 @@ class Experiment():
 
         else:
             # powersupply
-            print('\n\n\n', self.step)
             self.powersupply.set_voltage(int(self.step['voltage [V]']))
             self.powersupply.set_current(int(self.step['current [A]']))
             self.powersupply.set_power(int(self.step['power [W]']))
@@ -137,7 +136,6 @@ class Experiment():
         data = []
         while (not self.out_queue.empty()):
             data.append(self.out_queue.get())
-            print(data)
         return data
 
     def get_file_path(self):
@@ -152,7 +150,7 @@ class Experiment():
         buffer = []
         flag = True
 
-        while datetime.now() <= step_start_time + timedelta(minutes=self.step['duration [min]']):
+        while datetime.now() <= step_start_time + timedelta(minutes=float(self.step['duration [min]'])):
             this_time = datetime.now()
             if this_time >= last_measure + self.sampling_interval:  # checking interval
                 last_measure = this_time
@@ -162,7 +160,6 @@ class Experiment():
                 data.update(self.powersupply.get_data())
                 data.update(self.multimeter.get_data())
                 data.update(self.mfc.get_data())
-                print(data)
                 # putting data to buffer and queqe
 
                 self.out_queue.put(data)

@@ -12,8 +12,11 @@ from main import Experiment
 
 from flask import Flask, Response, render_template, stream_with_context
 
+test= False
+
+
 application = Flask(__name__)
-e = Experiment(test=True)
+e = Experiment(test=test)
 
 
 
