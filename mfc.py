@@ -112,6 +112,7 @@ if __name__ == '__main__':
     max_flow = 1000
     print('Start')
     mfc = MFC(host, port, max_flow)
+    print('init')
     time.sleep(1)
     print(mfc.valve_state())
     print(mfc.valve_state())

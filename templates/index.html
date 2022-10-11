@@ -1,23 +1,72 @@
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Measurement in progress</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-<head>
-    <meta charset="UTF-8">
-    <title>Creating Real-Time Charts with Flask</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" rel="stylesheet">
-</head>
+      .row {
+        display: flex;
+      }
 
-<body>
+      /* Create two equal columns that sits next to each other */
+      .column {
+        flex: 20%;
+        padding: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
     <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <canvas id="canvas"></canvas>
-                    </div>
-                </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <canvas id="canvas"></canvas>
             </div>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <div class="container">
+                <div class="row">
+                  <div class="column">
+                    <label id="volt_label">Volt [V] </label>
+                  </div>
+                  <div class="column">
+                    <label id="volt_value">value1</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="column">
+                    <label id="point_label">point [sccm]</label>
+                  </div>
+                  <div class="column">
+                    <label id="point_value">value2</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <!--suppress JSUnresolvedLibraryURL -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
@@ -26,82 +75,90 @@
     <!--suppress JSUnresolvedLibraryURL -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
     <script>
-        $(document).ready(function () {
-            const config = {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: "Resistance [Ohm]",
-                        backgroundColor: 'rgb(255, 99, 132)',
-                        borderColor: 'rgb(255, 99, 132)',
-                        data: [],
-                        fill: false,
-                    },
-                    {
-                        label: "parameter 1",
-                        backgroundColor: 'rgb(0, 255, 0)',
-                        borderColor: 'rgb(0, 255, 0)',
-                        data: [],
-                        fill: false,
-                    }
-                    ],
+      $(document).ready(function () {
+        const config = {
+          type: "line",
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: "Resistance [Ohm]",
+                backgroundColor: "rgb(255, 99, 132)",
+                borderColor: "rgb(255, 99, 132)",
+                data: [],
+                fill: false,
+              }//,
+              //{
+              //  label: "parameter 1",
+              //  backgroundColor: "rgb(0, 255, 0)",
+              //  borderColor: "rgb(0, 255, 0)",
+              //  data: [],
+              //  fill: false,
+              //},
+            ],
+          },
+          options: {
+            responsive: true,
+            title: {
+              display: true,
+              text: "MOX Sensordata",
+            },
+            tooltips: {
+              mode: "index",
+              intersect: false,
+            },
+            hover: {
+              mode: "nearest",
+              intersect: true,
+            },
+            scales: {
+              xAxes: [
+                {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Time",
+                  },
                 },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'MOX Sensordata'
-                    },
-                    tooltips: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    hover: {
-                        mode: 'nearest',
-                        intersect: true
-                    },
-                    scales: {
-                        xAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Time'
-                            }
-                        }],
-                        yAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'unit'
-                            }
-                        }]
-                    }
-                }
-            };
+              ],
+              yAxes: [
+                {
+                  display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: "unit",
+                  },
+                },
+              ],
+            },
+          },
+        };
 
-            const context = document.getElementById('canvas').getContext('2d');
+        const context = document.getElementById("canvas").getContext("2d");
 
-            const lineChart = new Chart(context, config);
+        const lineChart = new Chart(context, config);
 
-            const source = new EventSource("/chart-data");
+        const source = new EventSource("/chart-data");
 
-            source.onmessage = function (event) {
-                const data = JSON.parse(event.data);
-                console.log(data)
-                data.forEach(entrie => {
-                    if (config.data.labels.length === 20) {
-                        //config.data.labels.shift();
-                        //config.data.datasets[0].data.shift();
-                    }
-                    config.data.labels.push(entrie.time);
-                    config.data.datasets[0].data.push(entrie.resistance_multimeter_measured);
-                    config.data.datasets[1].data.push(entrie.point);
-                });
-                lineChart.update();
+        source.onmessage = function (event) {
+          const data = JSON.parse(event.data);
+          console.log(data);
+          data.forEach((entrie) => {
+            if (config.data.labels.length === 20) {
+              //config.data.labels.shift();
+              //config.data.datasets[0].data.shift();
             }
-        });
+            config.data.labels.push(entrie.time);
+            config.data.datasets[0].data.push(
+              entrie.resistance_multimeter_measured
+            );
+            //config.data.datasets[1].data.push(entrie.point);
+            document.getElementById("volt_value").innerHTML = entrie.voltage_set_ps;
+            document.getElementById("point_value").innerHTML = entrie.point;
+          });
+          lineChart.update();
+        };
+      });
     </script>
-</body>
-
+  </body>
 </html>

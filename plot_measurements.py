@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import numpy as np
 from os.path import join
 
+# test for selectinbg cols in plot
 
 def plot_measurement(path, test=False):
     df = pd.read_csv(path, sep='\t', decimal='.')
@@ -23,6 +24,7 @@ def plot_measurement(path, test=False):
     path_fig = join(path[:path.rfind('\\')],
                     path[path.rfind('\\')+1:path.rfind('.')] + '.html')
     fig.write_html(path_fig)
+
     # fig.show()
 
 
@@ -48,7 +50,8 @@ def plot_all_measurement_line(path, test=False):
     path_fig = join(path[:path.rfind('\\')],
                     path[path.rfind('\\')+1:path.rfind('.')] + '_line.html')
     fig.write_html(path_fig)
-    fig.show()
+
+    # fig.show()
 
 
 def plot_all(path, test=False):
@@ -73,6 +76,7 @@ def plot_all(path, test=False):
     path_fig = join(path[:path.rfind('\\')],
                     path[path.rfind('\\')+1:path.rfind('.')] + '.html')
     fig.write_html(path_fig)
+
     # fig.show()
 
 
@@ -98,9 +102,9 @@ def sort_df_time(df, test=False, sort='timestamp'):
 
 
 if __name__ == '__main__':
-    # path = "data\\program_10-07-2022_12-36-19\\program_10-07-2022_12-36-19_measure2.csv"
-    # plot_measurement(path)
+    path_single_Step = 'data\\program_10-11-2022_11-01-22\\program_10-11-2022_11-01-22_heating up.csv'
+    path_all_steps = 'data\program_10-11-2022_11-01-22\program_10-11-2022_11-01-22.csv'
 
-    path = 'data\\program_10-07-2022_17-24-38\\program_10-07-2022_17-24-38.csv'
-    # plot_all(path)
-    plot_all_measurement_line(path, test=True)
+    plot_measurement(path_single_Step, test = False)
+    plot_all(path_all_steps,test = False)
+    plot_all_measurement_line(path_all_steps, test=False)

@@ -24,8 +24,10 @@ address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
 mfc_ip = "192.168.2.100"
 mfc_port = 502
 mfc_max_flow = 1000
-buffer_size = 9
+buffer_size = 10
 update_plot = 2  # sek
+
+test = False
 
 
 class Experiment():
@@ -40,6 +42,7 @@ class Experiment():
             self.powersupply = PowerSupply(address_powersupply)
             self.multimeter = Multimeter(address_multimeter)
             self.mfc = MFC(mfc_ip, mfc_port, mfc_max_flow)
+            
 
         # change for experiments --> number of points in buffer to wirte to file
         self.buffer_size = buffer_size
@@ -112,6 +115,7 @@ class Experiment():
         self.out_queue = Queue()
         self.sampling_interval = timedelta(
             seconds=(1/(self.step['samplingrate [Hz]'])))
+
         step_name = self.step['step_name']
         print(self.step['samplingrate [Hz]'])
         file_name = f'{self.name}_{step_name}.csv'
@@ -134,12 +138,12 @@ class Experiment():
 
     def get_out_buffer(self):
         data = []
-        while (not self.out_queue.empty()):
+        while not self.out_queue.empty():
             data.append(self.out_queue.get())
         return data
 
     def get_file_path(self):
-        return self.filepath
+        return self.files
 
     def kill(self):
         exit()
@@ -169,10 +173,9 @@ class Experiment():
                     buffer = []
                 sleep(0.05)
         self.write_to_file(buffer, flag)
-        plot_measurement(self.filepath, test=True)
+        plot_measurement(self.filepath, test=self.test)
 
 
 if __name__ == '__main__':
-    experiment = Experiment()
-    # experiment = Experiment(test=True)
+    experiment = Experiment(test=test)
     experiment.start()
