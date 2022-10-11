@@ -9,6 +9,7 @@ from queue import Queue
 import pandas as pd
 import os
 from main import Experiment
+from matplotlib import pyplot as plt
 
 from flask import Flask, Response, render_template, stream_with_context
 
@@ -16,7 +17,7 @@ test= False
 
 
 application = Flask(__name__)
-e = Experiment(test=test)
+e = Experiment(test=False)
 
 
 
@@ -27,16 +28,25 @@ def index():
 
 @application.route('/chart-data')
 def chart_data():
-    def generate_random_data():
+    def load_data_from_file():
         data = []
-        try:
-            path = e.get_file_path()
-            df_loaded = pd.read_csv(path, decimal='.', sep='\t')
+        files = e.get_file_path()
+        if len(files) >0:
+            dfs = []
+            for file in files:
+                if os.path.isfile(file):
+                    dfs.append(pd.read_csv(file, decimal='.', sep='\t'))
+            df_loaded = pd.concat(dfs)
+            df_loaded.reset_index(drop=True, inplace=True)
             dict_loaded = df_loaded.to_dict('index')
-            data = [dict_loaded[i] for i in dict_loaded]
-            # print(data)
-        except:
-            print('file not found ')
+            for i in dict_loaded:
+                data.append(dict_loaded[i])
+        else:
+            print('no fiels to read')
+        return data
+
+    def read_data():
+        data = load_data_from_file()
         while True:
             for x in e.get_out_buffer():
                 data.append(x)
@@ -47,13 +57,14 @@ def chart_data():
             time.sleep(0.5)
 
     response = Response(stream_with_context(
-        generate_random_data()), mimetype="text/event-stream")
+        read_data()), mimetype="text/event-stream")
     response.headers["Cache-Control"] = "no-cache"
     response.headers["X-Accel-Buffering"] = "no"
     return response
 
 
 if __name__ == '__main__':
+
     Thread(target=e.start).start()
     time.sleep(2)
     application.run(port=2222, host="127.0.0.1")
