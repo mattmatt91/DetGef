@@ -89,22 +89,22 @@ class Experiment():
     def set_parameters(self):  # set parameters for every step in measurement
         if self.test:
             # powersupply
-            self.powersupply.set_value_1(int(self.step['voltage [V]']))
-            self.powersupply.set_value_2(int(self.step['current [A]']))
-            self.powersupply.set_value_3(int(self.step['power [W]']))
+            self.powersupply.set_value_1(float(self.step['voltage [V]']))
+            self.powersupply.set_value_2(float(self.step['current [A]']))
+            self.powersupply.set_value_3(float(self.step['power [W]']))
 
             # mfc
-            self.mfc.set_value_1(int(self.step['flow_total [ml/min]']))
+            self.mfc.set_value_1(float(self.step['flow_total [ml/min]']))
 
         else:
             # powersupply
-            self.powersupply.set_voltage(int(self.step['voltage [V]']))
-            self.powersupply.set_current(int(self.step['current [A]']))
-            self.powersupply.set_power(int(self.step['power [W]']))
+            self.powersupply.set_voltage(float(self.step['voltage [V]']))
+            self.powersupply.set_current(float(self.step['current [A]']))
+            self.powersupply.set_power(float(self.step['power [W]']))
             self.powersupply.supply_on()
 
             # mfc
-            self.mfc.set_point(self.step['flow_total [ml/min]'])
+            self.mfc.set_point(float(self.step['flow_total [ml/min]']))
 
     def close_devices(self):  # close connections to all devices
         self.multimeter.close()
