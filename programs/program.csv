@@ -1,7 +1,7 @@
 step_id	step_name	voltage [V]	power [W]	current [A]	flow_total [ml/min]	tanalyt_c [ppm]	samplingrate [Hz]	duration [min]
-0	heating up	3.5	10	1	500	100	10	0.1
-1	no substance	3.5	10	1	600	300	10	0.2
-2	substance 	3.5	10	1	600	300	10	0.2
-3	substance light	3.5	10	1	600	300	10	0.2
-4	no substance ligth	3.5	10	1	600	300	10	0.2
+0	heating up	3.5	10	1	500	100	2	0.1
+1	no substance	3.5	10	1	600	300	2	0.2
+2	substance 	3.5	10	1	600	300	2	0.2
+3	substance light	3.5	10	1	600	300	2	0.2
+4	no substance ligth	3.5	10	1	600	300	2	0.2
 
