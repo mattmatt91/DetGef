@@ -36,8 +36,9 @@ def chart_data():
             for file in files:
                 if os.path.isfile(file):
                     dfs.append(pd.read_csv(file, decimal='.', sep='\t'))
-            df_loaded = pd.concat(dfs)
+            df_loaded = pd.concat(dfs).dropna()
             df_loaded.reset_index(drop=True, inplace=True)
+            df_loaded.fillna(method="ffill" ,inplace=True)
             dict_loaded = df_loaded.to_dict('index')
             for i in dict_loaded:
                 data.append(dict_loaded[i])
