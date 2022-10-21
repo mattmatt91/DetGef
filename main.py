@@ -1,3 +1,5 @@
+from multiprocessing import set_start_method
+from unicodedata import name
 from matplotlib.pyplot import plot
 from test_device import TestDevice
 from plot_measurements import plot_measurement, plot_all, plot_all_measurement_line
@@ -12,6 +14,7 @@ from pathlib import Path
 import os
 from time import sleep
 from queue import Queue
+from relaisboard import Relaisboard
 
 
 program_path = 'program.csv'
@@ -23,11 +26,13 @@ address_powersupply = 'ASRL11::INSTR'
 address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
 mfc_ip = "192.168.2.100"
 mfc_port = 502
+relaisboard_port = 'COM7'
+num_valves = 11
 mfc_max_flow = 1000
 buffer_size = 10
 update_plot = 2  # sek
 
-test = False
+test = True
 
 
 class Experiment():
@@ -37,17 +42,19 @@ class Experiment():
             self.multimeter = TestDevice('multimeter')
             self.powersupply = TestDevice('powersupply')
             self.mfc = TestDevice('mfc')
+            self.relaisboard = TestDevice('relaisboard')
         else:
             # define defices and create instances of classes
             self.powersupply = PowerSupply(address_powersupply)
             self.multimeter = Multimeter(address_multimeter)
             self.mfc = MFC(mfc_ip, mfc_port, mfc_max_flow)
+            self.relaisboard = Relaisboard(relaisboard_port)
             
 
         # change for experiments --> number of points in buffer to wirte to file
         self.buffer_size = buffer_size
+        self.create_folder_structure() # run before read_program
         self.read_program()
-        self.create_folder_structure()
 
     def create_folder_structure(self):
         _time = datetime.now().strftime("_%m-%d-%Y_%H-%M-%S")
@@ -59,6 +66,9 @@ class Experiment():
     def read_program(self):  # reading program as pd.df
         _path_program = join(programs_defaultpath, program_path)
         self.program = pd.read_csv(_path_program, decimal='.', delimiter='\t')
+        name_program = program_path[:program_path.find('.')]
+        path_program_save = join(self.data_path, f'{self.name}_properties.csv')
+        self.program.to_csv(path_program_save, decimal='.', sep='\t', index=False)
         self.program.set_index('step_id', inplace=True)
         print(f'reading {program_path}')
 
@@ -106,10 +116,16 @@ class Experiment():
             # mfc
             self.mfc.set_point(float(self.step['flow_total [ml/min]']))
 
+            # relais
+            msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(num_valves +1)] # list of tuple with pin and state 
+
+            self.relaisboar.set_states(msg)
+
     def close_devices(self):  # close connections to all devices
         self.multimeter.close()
         self.powersupply.close()
         self.mfc.close()
+        self.relaisboard.close()
 
     def step_loop(self):  # loop during single steps, for saving data
         self.out_queue = Queue()
