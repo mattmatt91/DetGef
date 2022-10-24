@@ -53,7 +53,7 @@ class Relaisboard():
         self.board.exit()
 
 if __name__ == '__main__':
-    relaisboard = Relaisboard('COM7')
+    relaisboard = Relaisboard('COM13')
 
     print(relaisboard.get_state('valve1', 'valve2', 'valve11'))
     relaisboard.set_state(('valve1',True), ('valve2',True), ('valve11',False))
