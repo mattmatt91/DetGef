@@ -24,36 +24,31 @@ default_data_path = 'data'
 
 address_powersupply = 'ASRL11::INSTR'
 address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
-mfc_ip = "192.168.2.100"
-mfc_port = 502
 relaisboard_port = 'COM13'
-num_valves = 11
-mfc_max_flow = 1000
 buffer_size = 10
 update_plot = 2  # sek
 
-test = True
+test = False
 
 
 class Experiment():
     def __init__(self, test=False):
-        self.test = test
-        if self.test:
-            self.multimeter = TestDevice('multimeter')
-            self.powersupply = TestDevice('powersupply')
-            self.mfc = TestDevice('mfc')
-            self.relaisboard = TestDevice('relaisboard')
-        else:
-            # define defices and create instances of classes
-            self.powersupply = PowerSupply(address_powersupply)
-            self.multimeter = Multimeter(address_multimeter)
-            self.mfc = MFC(mfc_ip, mfc_port, mfc_max_flow)
-            self.relaisboard = Relaisboard(relaisboard_port)
-            
+        with open('properties_mfc.json', 'r') as f:
+            properties_mfc = json.load(f)
+
+        # define defices and create instances of classes
+        self.powersupply = PowerSupply(address_powersupply)
+        self.multimeter = Multimeter(address_multimeter)
+        # self.relaisboard = Relaisboard(relaisboard_port)
+        self.mfcs = {}
+        for mfc in properties_mfc:
+            _mfc = properties_mfc[mfc]
+            self.mfcs[mfc] = MFC(
+                _mfc["ip"], _mfc["port"], _mfc["flow_max"])
 
         # change for experiments --> number of points in buffer to wirte to file
         self.buffer_size = buffer_size
-        self.create_folder_structure() # run before read_program
+        self.create_folder_structure()  # run before read_program
         self.read_program()
 
     def create_folder_structure(self):
@@ -65,10 +60,11 @@ class Experiment():
 
     def read_program(self):  # reading program as pd.df
         _path_program = join(programs_defaultpath, program_path)
-        self.program = pd.read_csv(_path_program, decimal='.', delimiter='\t')
+        self.program = pd.read_csv(_path_program, decimal=',', delimiter=';')
         name_program = program_path[:program_path.find('.')]
         path_program_save = join(self.data_path, f'{self.name}_properties.csv')
-        self.program.to_csv(path_program_save, decimal='.', sep='\t', index=False)
+        self.program.to_csv(path_program_save, decimal=',',
+                            sep=';', index=False)
         self.program.set_index('step_id', inplace=True)
         print(f'reading {program_path}')
 
@@ -81,8 +77,9 @@ class Experiment():
             print(self.step)
             self.step_id = step_id
             self.set_parameters()
-            sleep(1)
-            self.step_loop()
+            # sleep(1)
+            # self.step_loop()
+            exit()
         self.merge_files()
         self.close_devices()
 
@@ -97,29 +94,22 @@ class Experiment():
         plot_all_measurement_line(path_merged, test=self.test)
 
     def set_parameters(self):  # set parameters for every step in measurement
-        if self.test:
-            # powersupply
-            self.powersupply.set_value_1(float(self.step['voltage [V]']))
-            self.powersupply.set_value_2(float(self.step['current [A]']))
-            self.powersupply.set_value_3(float(self.step['power [W]']))
 
-            # mfc
-            self.mfc.set_value_1(float(self.step['flow_total [ml/min]']))
+        # powersupply
+        self.powersupply.set_voltage(float(self.step['voltage [V]']))
+        self.powersupply.set_current(float(self.step['current [A]']))
+        self.powersupply.set_power(float(self.step['power [W]']))
+        self.powersupply.supply_on()
 
-        else:
-            # powersupply
-            self.powersupply.set_voltage(float(self.step['voltage [V]']))
-            self.powersupply.set_current(float(self.step['current [A]']))
-            self.powersupply.set_power(float(self.step['power [W]']))
-            self.powersupply.supply_on()
+        # mfc
+        for mfc in self.mfcs:
+            print(self.step_id, mfc)
+            exit()
+            # self.mfc.set_point(float(self.step[f'{mfc} [ml/min]']))
 
-            # mfc
-            self.mfc.set_point(float(self.step['flow_total [ml/min]']))
-
-            # relais
-            msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(num_valves +1)] # list of tuple with pin and state 
-
-            self.relaisboar.set_states(msg)
+        # relais
+        # msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(num_valves +1)] # list of tuple with pin and state
+        # self.relaisboard.set_states(msg)
 
     def close_devices(self):  # close connections to all devices
         self.multimeter.close()
@@ -140,17 +130,15 @@ class Experiment():
         self.files.append(self.filepath)
         self.get_data()
 
-
     def write_to_file(self, buffer, flag=False):
         df = pd.DataFrame(buffer)
         if flag:
             df.to_csv(self.filepath, sep='\t',
-                                decimal='.', index=False)
+                      decimal='.', index=False)
         else:
             df.to_csv(
                 self.filepath, sep='\t', decimal='.', mode='a', index=False, header=False)
         return False
-        
 
     def get_out_buffer(self):
         data = []
