@@ -12,13 +12,18 @@ valves = {'valve0': {'pin': 2, 'state': True},
           'valve8': {'pin': 10, 'state': True},
           'valve9': {'pin': 11, 'state': True},
           'valve10': {'pin': 12, 'state': True},
-          'valve11': {'pin': 13, 'state': True}}
+          'valve11': {'pin': 13, 'state': True},
+          'valve12': {'pin': 14, 'state': True},
+          'valve13': {'pin': 15, 'state': True},
+          'valve14': {'pin': 16, 'state': True},
+          'valve15': {'pin': 17, 'state': True},
+          'valve16': {'pin': 18, 'state': True}}
 
 
 class Relaisboard():
     def __init__(self, address):
         self.board = pyfirmata.Arduino(address)
-        self.num_pins = 11
+        self.num_pins = 16
         offset_pins = 2
         self.pins = valves
         self.close_all()
@@ -53,8 +58,9 @@ class Relaisboard():
         self.board.exit()
 
 if __name__ == '__main__':
-    relaisboard = Relaisboard('COM13')
-
+    print('start')
+    relaisboard = Relaisboard('COM14')
+    # exit()
     print(relaisboard.get_state('valve1', 'valve2', 'valve11'))
     relaisboard.set_state(('valve1',True), ('valve2',True), ('valve11',False))
     time.sleep(1)

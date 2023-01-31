@@ -78,8 +78,7 @@ class Experiment():
             step_id
             self.set_parameters()
             # sleep(1)
-            # self.step_loop()
-            exit()
+            self.step_loop()
         self.merge_files()
         self.close_devices()
 
@@ -90,8 +89,8 @@ class Experiment():
             dfs.append(pd.read_csv(file, decimal='.', sep='\t'))
         df_merged = pd.concat(dfs)
         df_merged.to_csv(path_merged, decimal='.', sep='\t', index=False)
-        plot_all(path_merged, test=self.test)
-        plot_all_measurement_line(path_merged, test=self.test)
+        plot_all(path_merged, test=False)
+        plot_all_measurement_line(path_merged, test=False)
 
     def set_parameters(self):  # set parameters for every step in measurement
         # powersupply
@@ -103,7 +102,7 @@ class Experiment():
         # mfc
         for mfc in self.mfcs:
             self.mfcs[mfc].set_point(float(self.step[f'{mfc} [ml/min]']))
-
+            self.mfcs[mfc].open_valve(True)
         # relais
         # msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(num_valves +1)] # list of tuple with pin and state
         # self.relaisboard.set_states(msg)
@@ -113,8 +112,7 @@ class Experiment():
         self.powersupply.close()
         for mfc in self.mfcs:
             self.mfcs[mfc].close()
-        self.mfc.close()
-        self.relaisboard.close()
+        # self.relaisboard.close()
 
     def step_loop(self):  # loop during single steps, for saving data
         self.out_queue = Queue()
@@ -166,7 +164,8 @@ class Experiment():
                         'timestamp': str(datetime.now() - step_start_time)}
                 data.update(self.powersupply.get_data())
                 data.update(self.multimeter.get_data())
-                data.update(self.mfc.get_data())
+                for mfc in self.mfcs:
+                    data.update(self.mfcs[mfc].get_data())
                 # putting data to buffer and queqe
 
                 self.out_queue.put(data)
@@ -176,7 +175,7 @@ class Experiment():
                     buffer = []
                 sleep(0.05)
         self.write_to_file(buffer, flag)
-        plot_measurement(self.filepath, test=self.test)
+        plot_measurement(self.filepath, test=False)
 
 
 if __name__ == '__main__':

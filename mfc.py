@@ -78,10 +78,10 @@ class MFC():
         response = self.bus.read_holding_registers(int('0xA000', 16), 2)
         return ints_to_float(response)
 
-    def set_point(self, flo): # set ccm from 0 to 1000
-        if flo > self.max_flow:
+    def set_point(self, flow): # set ccm from 0 to 1000
+        if flow > self.max_flow:
             raise ValueError("flow can't be bigger than max_flow")
-        flo_rel = flo/self.max_flow
+        flo_rel = flow/self.max_flow
         data = float_to_ints(flo_rel)
         self.bus.write_multiple_registers(int('0xA000', 16), data)
 
@@ -102,6 +102,7 @@ class MFC():
 
     
     def close(self):
+        self.close_valve(True)
         self.bus.close()
     
 
