@@ -33,7 +33,7 @@ def float_to_ints(flo):
 
 
 class MFC():
-    def __init__(self, host, port, max_flow):
+    def __init__(self, host, port, max_flow):#
         self.bus = ModbusClient(host=host, port=port, auto_open=True)
         time.sleep(0.2) 
         self.bus.open()
@@ -107,13 +107,24 @@ class MFC():
 
 
 if __name__ == '__main__':
-    host="192.168.2.100"
-    port=502
-    max_flow = 1000
-    print('Start')
-    mfc = MFC(host, port, max_flow)
-    print('init')
+    host_2000sccm="192.168.2.10"
+    port_2000sccm=502
+    max_flow_2000sccm = 1000
+
+    host_20sccm="192.168.2.16"
+    port_20sccm=502
+    max_flow_20sccm = 20
+
+
+    mfc2000 = MFC(host_2000sccm, port_2000sccm, max_flow_2000sccm)
+    mfc20 = MFC(host_20sccm, port_20sccm, max_flow_20sccm)
     time.sleep(1)
+    mfc2000.set_point(mfc2000.max_flow)
+    # mfc2000.open_valve(True)
+    mfc20.set_point(mfc20.max_flow)
+    mfc20.open_valve(True)
+    time.sleep(60)
+    exit()
     print(mfc.valve_state())
     print(mfc.valve_state())
     print(mfc.get_temp())
@@ -121,8 +132,8 @@ if __name__ == '__main__':
     print(mfc.get_flow_total())
     print(mfc.get_point())
     print(mfc.get_valve_pos())
-    print('finished test1')
     i = 0
+    print('finished test1')
     while True:
         i += 1
         mfc.set_point(i%100)

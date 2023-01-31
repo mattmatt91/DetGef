@@ -68,4 +68,4 @@ if __name__ == '__main__':
 
     Thread(target=e.start).start()
     time.sleep(2)
-    application.run(port=2222, host="172.29.28.48")
+    application.run(port=2222, host="127.0.0.1")

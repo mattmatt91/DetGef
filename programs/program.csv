@@ -1,4 +1,4 @@
-step_id	step_name	voltage [V]	power [W]	current [A]	flow_total [ml/min]	tanalyt_c [ppm]	samplingrate [Hz]	duration [min]	valve0	valve1	valve2	valve3	valve4	valve5	valve6	valve7	valve8	valve9	valve10	valve11
-0	heating up	2.2	1	1	500	100	1	0.1	False	False	False	False	False	False	False	False	False	False	False	False
-1	 measure1	3.0	1	1	600	300	10	0.2	False	False	False	False	False	False	False	False	False	False	False	False
-2	measure2	3.1	1	1	600	300	10	0.2	False	False	False	False	False	False	False	False	False	False	False	False
+step_id;step_name;voltage [V];power [W];current [A];mfc1 [ml/min];mfc2 [ml/min];samplingrate [Hz];duration [min]
+0;heating up;2,2;1;1;500;100;1;0,1
+1; measure1;3;1;1;600;200;10;0,2
+2;measure2;3,1;1;1;600;50;10;0,2

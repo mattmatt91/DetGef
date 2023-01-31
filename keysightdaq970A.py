@@ -23,7 +23,12 @@ class KeysightDAQ970a():
         # set channels to resustance  # set channels to resustance
         self.client.write(":SYSTem:BEEPer:STATe 0")
 
+
+
     def set_param(self):
+        self.client.write("CONF:RES")
+        self.client.write("RES:RANG:AUTO OFF")
+        # DATASHEET 244
         pass
 
 
@@ -34,8 +39,7 @@ class KeysightDAQ970a():
         return err
 
     def get_data(self):
-        query = f"MEAS:RES? 100,0.0001, (@{self.scanlist[0]}:{self.scanlist[-1]})"
-        print(self.i)
+        query = f"MEAS:RES? (@{self.scanlist[0]}:{self.scanlist[-1]})"
         self.i +=1
         data = self.client.query(query)
         data= [float(i) for i in data.split(',')]
@@ -55,7 +59,6 @@ for i in range(10):
     time.sleep(1)
     keysightdaq970a.get_errors()
     data.append(keysightdaq970a.get_data())
-    print('___________________________')
 df = pd.DataFrame(data)
 print(df)
 
