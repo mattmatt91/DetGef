@@ -75,7 +75,7 @@ class Experiment():
             self.step = self.program.loc[step_id]
             print(f'starting step {step_id}')
             print(self.step)
-            self.step_id = step_id
+            step_id
             self.set_parameters()
             # sleep(1)
             # self.step_loop()
@@ -94,7 +94,6 @@ class Experiment():
         plot_all_measurement_line(path_merged, test=self.test)
 
     def set_parameters(self):  # set parameters for every step in measurement
-
         # powersupply
         self.powersupply.set_voltage(float(self.step['voltage [V]']))
         self.powersupply.set_current(float(self.step['current [A]']))
@@ -103,9 +102,7 @@ class Experiment():
 
         # mfc
         for mfc in self.mfcs:
-            print(self.step_id, mfc)
-            exit()
-            # self.mfc.set_point(float(self.step[f'{mfc} [ml/min]']))
+            self.mfcs[mfc].set_point(float(self.step[f'{mfc} [ml/min]']))
 
         # relais
         # msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(num_valves +1)] # list of tuple with pin and state
@@ -114,6 +111,8 @@ class Experiment():
     def close_devices(self):  # close connections to all devices
         self.multimeter.close()
         self.powersupply.close()
+        for mfc in self.mfcs:
+            self.mfcs[mfc].close()
         self.mfc.close()
         self.relaisboard.close()
 
