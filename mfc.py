@@ -67,6 +67,8 @@ class MFC():
 
     def get_flow(self):
         response = self.bus.read_input_registers(int('0x4000', 16), 2)
+        # print('flow response raw: ', response)
+        # print('flow response float: ', ints_to_float(response))
         return ints_to_float(response)  
 
     def get_valve_pos(self):
@@ -76,14 +78,16 @@ class MFC():
 
     def get_point(self):
         response = self.bus.read_holding_registers(int('0xA000', 16), 2)
+        # print('point response raw: ', response)
+        # print('point response float: ', ints_to_float(response))
         return ints_to_float(response)
 
-    def set_point(self, flow): # set ccm from 0 to 1000
+    def set_point(self, flow): 
         if flow > self.max_flow:
-            raise ValueError("flow can't be bigger than max_flow")
-        flo_rel = flow/self.max_flow
-        data = float_to_ints(flo_rel)
+           raise ValueError("flow can't be bigger than max_flow")
+        data = float_to_ints(flow)
         self.bus.write_multiple_registers(int('0xA000', 16), data)
+
 
     def get_data(self):
         try:
@@ -110,41 +114,31 @@ class MFC():
 if __name__ == '__main__':
     host_2000sccm="192.168.2.10"
     port_2000sccm=502
-    max_flow_2000sccm = 1000
+    max_flow_2000sccm = 2000
 
     host_20sccm="192.168.2.16"
     port_20sccm=502
     max_flow_20sccm = 20
 
 
-    mfc2000 = MFC(host_2000sccm, port_2000sccm, max_flow_2000sccm)
     mfc20 = MFC(host_20sccm, port_20sccm, max_flow_20sccm)
-    time.sleep(1)
-    mfc2000.set_point(mfc2000.max_flow)
-    # mfc2000.open_valve(True)
-    mfc20.set_point(mfc20.max_flow)
-    mfc20.open_valve(True)
-    time.sleep(60)
-    exit()
-    print(mfc.valve_state())
-    print(mfc.valve_state())
-    print(mfc.get_temp())
-    print(mfc.get_flow())
-    print(mfc.get_flow_total())
-    print(mfc.get_point())
-    print(mfc.get_valve_pos())
-    i = 0
-    print('finished test1')
+    mfc20.open_valve(False)
+    mfc20.close_valve(False)
+
+    mfc2000 = MFC(host_2000sccm, port_2000sccm, max_flow_2000sccm)
+    mfc2000.open_valve(False)
+    mfc2000.close_valve(False)
+
+    mfc2000.set_point(2000)
+
+    mfc20.set_point(20)
+
+
     while True:
-        i += 1
-        mfc.set_point(i%100)
-        print(mfc.valve_state())
-        print(mfc.get_temp())
-        print(mfc.get_flow())
-        print(mfc.get_flow_total())
-        print(mfc.get_point())
-        print()
-        time.sleep(0.1)
+        time.sleep(1)
+    exit()
+   
+
 
 
 

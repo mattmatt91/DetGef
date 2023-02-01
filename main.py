@@ -101,8 +101,9 @@ class Experiment():
 
         # mfc
         for mfc in self.mfcs:
-            self.mfcs[mfc].set_point(float(self.step[f'{mfc} [ml/min]']))
             self.mfcs[mfc].open_valve(True)
+            self.mfcs[mfc].open_valve(True)
+            self.mfcs[mfc].set_point(float(self.step[f'{mfc} [ml/min]']))
         # relais
         # msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(num_valves +1)] # list of tuple with pin and state
         # self.relaisboard.set_states(msg)
