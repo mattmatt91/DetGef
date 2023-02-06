@@ -34,8 +34,10 @@ class PowerSupply():
     def set_voltage(self, voltage):
         self.client.write(f'VOLT {float(voltage)}')
         self.client.write(f'VOLT {float(voltage)}') # warum klappt das erst beim zweiten mal?
+        print(self.client.query('VOLTage?').split()[0])
+        print(float(voltage))
         if float(self.client.query('VOLTage?').split()[0]) != float(voltage):
-            raise ValueError('error while setting voltage')
+            print('error while setting voltage')
 
     def set_current(self, current):
         self.client.write(f'CURR {float(current)}')

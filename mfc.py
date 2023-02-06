@@ -38,6 +38,8 @@ class MFC():
         time.sleep(0.2) 
         self.bus.open()
         self.max_flow = max_flow
+        self.open_valve(False)
+        self.close_valve(False)
         self.reset()
      
     def open_valve(self,state):
@@ -116,26 +118,25 @@ if __name__ == '__main__':
     port_2000sccm=502
     max_flow_2000sccm = 2000
 
-    host_20sccm="192.168.2.16"
-    port_20sccm=502
-    max_flow_20sccm = 20
+    host_1000sccm="192.168.2.100"
+    port_1000sccm=502
+    max_flow_1000sccm = 1000
 
 
-    mfc20 = MFC(host_20sccm, port_20sccm, max_flow_20sccm)
-    mfc20.open_valve(False)
-    mfc20.close_valve(False)
-
+    mfc1000 = MFC(host_1000sccm, port_1000sccm, max_flow_1000sccm)
     mfc2000 = MFC(host_2000sccm, port_2000sccm, max_flow_2000sccm)
-    mfc2000.open_valve(False)
-    mfc2000.close_valve(False)
+
 
     mfc2000.set_point(2000)
 
-    mfc20.set_point(20)
+    mfc1000.set_point(20)
 
 
     while True:
         time.sleep(1)
+        mfc1000.get_point()
+        mfc1000.get_flow()
+        
     exit()
    
 

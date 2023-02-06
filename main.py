@@ -17,7 +17,7 @@ from queue import Queue
 from relaisboard import Relaisboard
 
 
-program_path = 'program.csv'
+program_path = 'Rene_060223.csv'
 programs_defaultpath = 'programs'
 default_data_path = 'data'
 
@@ -35,7 +35,6 @@ class Experiment():
     def __init__(self, test=False):
         with open('properties_mfc.json', 'r') as f:
             properties_mfc = json.load(f)
-
         # define defices and create instances of classes
         self.powersupply = PowerSupply(address_powersupply)
         self.multimeter = Multimeter(address_multimeter)
@@ -101,8 +100,7 @@ class Experiment():
 
         # mfc
         for mfc in self.mfcs:
-            self.mfcs[mfc].open_valve(True)
-            self.mfcs[mfc].open_valve(True)
+            print(float(self.step[f'{mfc} [ml/min]']))
             self.mfcs[mfc].set_point(float(self.step[f'{mfc} [ml/min]']))
         # relais
         # msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(num_valves +1)] # list of tuple with pin and state
@@ -121,7 +119,6 @@ class Experiment():
             seconds=(1/(self.step['samplingrate [Hz]'])))
 
         step_name = self.step['step_name']
-        print(self.step['samplingrate [Hz]'])
         file_name = f'{self.name}_{step_name}.csv'
         self.filepath = join(self.data_path, file_name)
         print(self.filepath)
@@ -180,5 +177,7 @@ class Experiment():
 
 
 if __name__ == '__main__':
+    print('init measurement')
     experiment = Experiment(test=test)
+    print('starting measurement')
     experiment.start()

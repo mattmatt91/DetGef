@@ -1,4 +1,4 @@
 step_id;step_name;voltage [V];power [W];current [A];mfc1 [ml/min];mfc2 [ml/min];samplingrate [Hz];duration [min]
-0;heating up;2,2;1;1;100;20;1;10
-1; measure1;3;1;1;100;20;10;20
-2;measure2;3,1;1;1;300;5;10;20
+0;heating up;3,5;2;1;500;0;1;1
+1; measure1;3,5;2;1;500;0;10;1
+2;measure2;3,5;2;1;400;100;10;1
