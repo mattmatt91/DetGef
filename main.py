@@ -24,7 +24,7 @@ default_data_path = 'data'
 
 address_powersupply = 'ASRL11::INSTR'
 address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
-relaisboard_port = 'COM13'
+# relaisboard_port = 'COM13'
 buffer_size = 10
 update_plot = 2  # sek
 
@@ -38,7 +38,7 @@ class Experiment():
         # define defices and create instances of classes
         self.powersupply = PowerSupply(address_powersupply)
         self.multimeter = Multimeter(address_multimeter)
-        # self.relaisboard = Relaisboard(relaisboard_port)
+        self.relaisboard = Relaisboard()
         self.mfcs = {}
         for mfc in properties_mfc:
             _mfc = properties_mfc[mfc]
@@ -100,10 +100,11 @@ class Experiment():
 
         # mfc
         for mfc in self.mfcs:
-            print(float(self.step[f'{mfc} [ml/min]']))
             self.mfcs[mfc].set_point(float(self.step[f'{mfc} [ml/min]']))
+
         # relais
-        # msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(num_valves +1)] # list of tuple with pin and state
+        # msg = [(f'valve{valve}', self.step['valve{valve}']) for valve in range(len(self.relaisboard.pins))] # list of tuple with pin and state
+        # print(f'mgs relais: {msg}')
         # self.relaisboard.set_states(msg)
 
     def close_devices(self):  # close connections to all devices

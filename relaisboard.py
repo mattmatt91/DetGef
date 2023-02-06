@@ -7,7 +7,7 @@ n_relais = 16
 
 
 class Relaisboard():
-    def __init__(self, address, n_relais=n_relais, offset=offset):
+    def __init__(self, address='COM17', n_relais=n_relais, offset=offset):
         self.board = pyfirmata.ArduinoDue(address)
         self.pins = [
             [self.board.get_pin(f'd:{i+offset}:o'), False] for i in range(n_relais)]
