@@ -5,7 +5,8 @@ from matplotlib import pyplot as plt
 
 # PW datasheet A1s2d3f4!
 
-address_keysightdaq970a = 'USB0::0x2A8D::0x5101::MY58018230::INSTR'
+address_keysightdaq970a = 'USB0::0x2A8D::0x5101::MY58018230::0::INSTR'# home
+# address_keysightdaq970a = 'USB0::0x2A8D::0x5101::MY58018230::INSTR'# rhb
 card_slot = 1
 
 
@@ -16,19 +17,23 @@ class KeysightDAQ970a():
         self.client = self.rm.open_resource(address)
         self.client.timeout = 10000  # set a delay
         self.client.read_termination = '\n'
+        self.scanlist ="(@201,202,203,204)"
+        self.client.write("*RST")
         print(self.client.query("*IDN?"))
-        self.client.query('*RST;*OPC?;*CLS')
         self.client.write(":SYSTem:BEEPer:STATe 0")
-        self.scanlist = "102,103"
 
     def get_errors(self):
         err = self.client.query("SYST:ERR?")
         return err
 
     def set_param(self):
-        msg_conf = f"ACQ:RES DEF,DEF,DEF,(@102)\n"
-        print(msg_conf)
-        self.client.write(msg_conf)
+        self.client.write(f":ROUTe:SCAN  {self.scanlist}")
+        self.client.write(f":CONFigure:FRESistance AUTO,DEFault, {self.scanlist}")
+        self.client.write(f":SENSe:RESistance:RANGe:AUTO 1, {self.scanlist}")
+        self.client.write(f":SENSe:RESistance:APERture:ENABle 1, {self.scanlist}")
+        self.client.write(f":SENSe:RESistance:APERture 0.02, {self.scanlist}")
+        self.client.write(f":SENSe:RESistance:NPLCycles 0.06, {self.scanlist}")
+        
 
         msg_conf = f"RES:APER:ENAB ON ,(@102)\n" 
         print(msg_conf)
@@ -40,10 +45,9 @@ class KeysightDAQ970a():
 
 
     def get_data(self):
-        t = time.time()
-        self.i += 1
-        msg = f"MEAS:RES? ,(@102)"
-        print(msg)
+        # self.client.write(":READ?")
+        self.client.write(":INITiate")
+        self.client.write(":FETCh?")
         data = self.client.query(msg)
         data = [float(i) for i in data.split(',')]
         print(time.time()-t)
@@ -61,3 +65,5 @@ if __name__ == '__main__':
     print(keysightdaq970a.get_data())
     print(keysightdaq970a.get_errors())
     keysightdaq970a.close()
+
+
