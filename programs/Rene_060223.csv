@@ -1,5 +1,5 @@
 step_id;step_name;voltage [V];power [W];current [A];mfc1 [ml/min];mfc2 [ml/min];samplingrate [Hz];duration [min]
-0;Initinal Clean;4,5;3;1;500;0;1;0,30
+0;Initinal Clean;4,5;3;1;500;0;1;30
 1;heating up;0,1;2;1;200;0;1;30
 2;Measure_1;0,1;2;1;100;100;1;30
 3;Blank_1;0,1;2;1;200;0;1;30

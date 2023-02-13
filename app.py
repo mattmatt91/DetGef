@@ -13,12 +13,11 @@ from matplotlib import pyplot as plt
 
 from flask import Flask, Response, render_template, stream_with_context
 
-test= False
+test = False
 
 
 application = Flask(__name__)
 e = Experiment(test=False)
-
 
 
 @application.route('/')
@@ -31,20 +30,17 @@ def chart_data():
     def load_data_from_file():
         data = []
         files = e.get_file_path()
-        if len(files) >0:
-            try:
-                dfs = []
-                for file in files:
-                    if os.path.isfile(file):
-                        dfs.append(pd.read_csv(file, decimal='.', sep='\t'))
-                df_loaded = pd.concat(dfs).dropna()
-                df_loaded.reset_index(drop=True, inplace=True)
-                df_loaded.fillna(method="ffill" ,inplace=True)
-                dict_loaded = df_loaded.to_dict('index')
-                for i in dict_loaded:
-                    data.append(dict_loaded[i])
-            except:
-                print('no files to merge')
+        if len(files) > 0:
+            dfs = []
+            for file in files:
+                if os.path.isfile(file):
+                    dfs.append(pd.read_csv(file, decimal='.', sep='\t'))
+            df_loaded = pd.concat(dfs).dropna()
+            df_loaded.reset_index(drop=True, inplace=True)
+            df_loaded.fillna(method="ffill", inplace=True)
+            dict_loaded = df_loaded.to_dict('index')
+            for i in dict_loaded:
+                data.append(dict_loaded[i])
         else:
             print('no fiels to read')
         return data

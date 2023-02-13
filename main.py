@@ -15,7 +15,7 @@ import os
 from time import sleep
 from queue import Queue
 from relaisboard import Relaisboard
-
+from colorama import Fore, Back, Style
 
 program_path = 'Rene_060223.csv'
 programs_defaultpath = 'programs'
@@ -33,13 +33,18 @@ test = False
 
 class Experiment():
     def __init__(self, test=False):
+      
+        # define defices and create instances of classes
+        print(Fore.GREEN + 'init ' + Fore.RESET + 'powersupply')
+        self.powersupply = PowerSupply(address_powersupply)
+        print(Fore.GREEN + 'init ' + Fore.RESET + 'multimeter')
+        self.multimeter = Multimeter(address_multimeter)
+        print(Fore.GREEN + 'init ' + Fore.RESET + 'relays')
+        self.relaisboard = Relaisboard()
+        print(Fore.GREEN + 'init ' + Fore.RESET + 'mfcs')
+        self.mfcs = {}
         with open('properties_mfc.json', 'r') as f:
             properties_mfc = json.load(f)
-        # define defices and create instances of classes
-        self.powersupply = PowerSupply(address_powersupply)
-        self.multimeter = Multimeter(address_multimeter)
-        self.relaisboard = Relaisboard()
-        self.mfcs = {}
         for mfc in properties_mfc:
             _mfc = properties_mfc[mfc]
             self.mfcs[mfc] = MFC(
@@ -47,7 +52,9 @@ class Experiment():
 
         # change for experiments --> number of points in buffer to wirte to file
         self.buffer_size = buffer_size
+        print('ceate folder structure')
         self.create_folder_structure()  # run before read_program
+        print('reading program')
         self.read_program()
 
     def create_folder_structure(self):
@@ -60,7 +67,6 @@ class Experiment():
     def read_program(self):  # reading program as pd.df
         _path_program = join(programs_defaultpath, program_path)
         self.program = pd.read_csv(_path_program, decimal=',', delimiter=';')
-        name_program = program_path[:program_path.find('.')]
         path_program_save = join(self.data_path, f'{self.name}_properties.csv')
         self.program.to_csv(path_program_save, decimal=',',
                             sep=';', index=False)
@@ -68,28 +74,31 @@ class Experiment():
         print(f'reading {program_path}')
 
     def start(self):  # startung measurement
-        self.files = []
+        self.files = {}
         self.global_start = datetime.now()
         for step_id in self.program.index:
             self.step = self.program.loc[step_id]
-            print(f'starting step {step_id}')
+            self.step_id = step_id
+            print(Fore.RED + f'starting step ' + Style.RESET_ALL + f'{step_id}')
             print(self.step)
-            step_id
             self.set_parameters()
-            # sleep(1)
             self.step_loop()
-        self.merge_files()
+        self.mergefiles()
         self.close_devices()
 
-    def merge_files(self):
-        path_merged = join(self.data_path, f'{self.name}.csv')
+        
+
+    def mergefiles(self):
+        path_merged = join(self.data_path, f'{self.name}_merged.csv')
         dfs = []
         for file in self.files:
-            dfs.append(pd.read_csv(file, decimal='.', sep='\t'))
+            df = pd.read_csv(self.files[file], decimal=',', sep=';')
+            df.set_index('time', inplace=True)
+            dfs.append(df)
         df_merged = pd.concat(dfs)
-        df_merged.to_csv(path_merged, decimal='.', sep='\t', index=False)
-        plot_all(path_merged, test=False)
-        plot_all_measurement_line(path_merged, test=False)
+        df_merged.to_csv(path_merged, decimal=',', sep=';', index=True)
+        # plot_all(path_merged, test=False)
+        # plot_all_measurement_line(path_merged, test=False)
 
     def set_parameters(self):  # set parameters for every step in measurement
         # powersupply
@@ -120,20 +129,20 @@ class Experiment():
             seconds=(1/(self.step['samplingrate [Hz]'])))
 
         step_name = self.step['step_name']
-        file_name = f'{self.name}_{step_name}.csv'
+        file_name = f'{self.name}_{step_name}_{self.step_id}.csv'
         self.filepath = join(self.data_path, file_name)
         print(self.filepath)
-        self.files.append(self.filepath)
+        self.files[self.step_id] = self.filepath
         self.get_data()
 
     def write_to_file(self, buffer, flag=False):
         df = pd.DataFrame(buffer)
         if flag:
-            df.to_csv(self.filepath, sep='\t',
-                      decimal='.', index=False)
+            df.to_csv(self.filepath, sep=';',
+                      decimal=',', index=False)
         else:
             df.to_csv(
-                self.filepath, sep='\t', decimal='.', mode='a', index=False, header=False)
+                self.filepath, sep=';', decimal=',', mode='a', index=False, header=False)
         return False
 
     def get_out_buffer(self):
@@ -174,11 +183,11 @@ class Experiment():
                     buffer = []
                 sleep(0.05)
         self.write_to_file(buffer, flag)
-        plot_measurement(self.filepath, test=False)
+        # plot_measurement(self.filepath, test=False)
 
 
 if __name__ == '__main__':
-    print('init measurement')
+    print(Fore.GREEN + 'init ' + Fore.RESET + 'measurement')
     experiment = Experiment(test=test)
     print('starting measurement')
     experiment.start()

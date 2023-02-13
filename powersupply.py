@@ -26,22 +26,34 @@ class PowerSupply():
         string = self.client.query('*IDN?')
         print(string)
 
+    
     def set_voltage(self, voltage):
-        while float(self.client.query('VOLTage?').split()[0]) != float(voltage):
-            self.client.write(f'VOLT {float(voltage)}')
+        try:
+            while float(self.client.query('VOLTage?').split()[0]) != float(voltage):
+                self.client.write(f'VOLT {float(voltage)}')
+                sleep(0.5)
+        except:
+            print('cannot set value')
 
     def set_current(self, current):
-        while float(self.client.query('CURRent?').split()[0]) != float(current):
-           
-            self.client.write(f'CURR {float(current)}')
+        try:
+            while float(self.client.query('CURRent?').split()[0]) != float(current):
+                self.client.write(f'CURR {float(current)}')
+                sleep(0.5)
+        except:
+            print('cannot set value')
 
     def set_power(self, power):
-        while float(self.client.query('POWer?').split()[0]) != float(power):
-            self.client.write(f'POW {float(power)}')
+        try:
+            while float(self.client.query('POWer?').split()[0]) != float(power):
+                self.client.write(f'POW {float(power)}')
+                sleep(0.5)
+        except:
+            print('cannot set value')
 
-    def set_input_resistance(self, resistance):
-        while float(self.client.query('POWer?').split()[0]) != float(resistance):
-            self.client.write(f'POW {float(resistance)}')
+    # def set_input_resistance(self, resistance):
+    #     while float(self.client.query('POWer?').split()[0]) != float(resistance):
+    #         self.client.write(f'POW {float(resistance)}')
 
     def get_voltage_set(self):
         string = self.client.query(f'VOLT?')

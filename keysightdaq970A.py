@@ -6,7 +6,8 @@ from matplotlib import pyplot as plt
 # PW datasheet A1s2d3f4!
 
 address_keysightdaq970a = 'USB0::0x2A8D::0x5101::MY58018230::INSTR'
-card_slot = 2
+card_slot = 1
+
 
 class KeysightDAQ970a():
     def __init__(self, address):
@@ -17,49 +18,46 @@ class KeysightDAQ970a():
         self.client.read_termination = '\n'
         print(self.client.query("*IDN?"))
         self.client.query('*RST;*OPC?;*CLS')
-        print(self.client.query('SYST:CTYP? 2'))
-        
-        self.scanlist = [card_slot*100+ i+1 for i in range(20)] # ,114,115,116,117,118,119,120]
-        # set channels to resustance  # set channels to resustance
         self.client.write(":SYSTem:BEEPer:STATe 0")
-
-
-
-    def set_param(self):
-        self.client.write("CONF:RES")
-        self.client.write("RES:RANG:AUTO OFF")
-        # DATASHEET 244
-        pass
-
-
-
+        self.scanlist = "102,103"
 
     def get_errors(self):
         err = self.client.query("SYST:ERR?")
         return err
 
-    def get_data(self):
-        query = f"MEAS:RES? (@{self.scanlist[0]}:{self.scanlist[-1]})"
-        self.i +=1
-        data = self.client.query(query)
-        data= [float(i) for i in data.split(',')]
-        return data
+    def set_param(self):
+        msg_conf = f"ACQ:RES DEF,DEF,DEF,(@102)\n"
+        print(msg_conf)
+        self.client.write(msg_conf)
 
+        msg_conf = f"RES:APER:ENAB ON ,(@102)\n" 
+        print(msg_conf)
+        self.client.write(msg_conf)
+
+        msg_conf = f"RES:APER 10E-01 ,(@102)\n"
+        print(msg_conf)
+        self.client.write(msg_conf)
+
+
+    def get_data(self):
+        t = time.time()
+        self.i += 1
+        msg = f"MEAS:RES? ,(@102)"
+        print(msg)
+        data = self.client.query(msg)
+        data = [float(i) for i in data.split(',')]
+        print(time.time()-t)
+        return data
 
     def close(self):
         self.client.close()
         self.rm.close()
 
 
-
-keysightdaq970a=KeysightDAQ970a(address_keysightdaq970a)
-keysightdaq970a.set_param()
-data = []
-for i in range(10):
-    time.sleep(1)
-    keysightdaq970a.get_errors()
-    data.append(keysightdaq970a.get_data())
-df = pd.DataFrame(data)
-print(df)
-
-keysightdaq970a.close()
+if __name__ == '__main__':
+    keysightdaq970a = KeysightDAQ970a(address_keysightdaq970a)
+    keysightdaq970a.set_param()
+    print(keysightdaq970a.get_errors())
+    print(keysightdaq970a.get_data())
+    print(keysightdaq970a.get_errors())
+    keysightdaq970a.close()
