@@ -16,7 +16,7 @@ class Multimeter():
         self.set_resistance()
 
     def get_identity(self):
-        print(cf.RED, self.client.query("*IDN?"),cf.RESET)
+        print(self.client.query("*IDN?"))
 
     def set_SCPI(self):
         self.client.write('*LANG SCPI')
