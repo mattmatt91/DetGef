@@ -35,10 +35,13 @@ class KeysightDAQ970a():
 
     def get_data(self):
         # self.client.write(":READ?")
-        self.client.write(":INITiate")
-        data = self.client.query(":FETCh?")
-        data = [float(i) for i in data.split(',')]
         sensors = ['S1', 'S2', 'S3', 'S4']
+        try:
+            self.client.write(":INITiate")
+            data = self.client.query(":FETCh?")
+            data = [float(i) for i in data.split(',')]
+        except:
+            data = [None for _ in sensors]
         result = {}
         for sensor, value in zip(sensors, data):
             result[sensor + "_resistance_multimeter_measured"] = value

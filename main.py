@@ -14,7 +14,7 @@ from relaisboard import Relaisboard
 from colorama import Fore, Back, Style
 from keysightdaq970A import KeysightDAQ970a
 
-program_path = 'program.csv'
+program_path = 'Rene_060223.csv'
 programs_defaultpath = 'programs'
 default_data_path = 'data'
 
