@@ -16,7 +16,7 @@ class KeysightDAQ970a():
         self.client.read_termination = '\n'
         self.scanlist = "(@201,202,203,204)"
         self.client.write("*RST")
-        print(self.client.query("*IDN?"))
+        # print(self.client.query("*IDN?"))
         self.client.write(":SYSTem:BEEPer:STATe 0")
 
     def get_errors(self):
@@ -42,7 +42,7 @@ class KeysightDAQ970a():
         result = {}
         for sensor, value in zip(sensors, data):
             result[sensor + "_resistance_multimeter_measured"] = value
-        return data
+        return result
 
     def close(self):
         self.client.close()

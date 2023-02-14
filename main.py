@@ -14,7 +14,7 @@ from relaisboard import Relaisboard
 from colorama import Fore, Back, Style
 from keysightdaq970A import KeysightDAQ970a
 
-program_path = 'Rene_060223.csv'
+program_path = 'program.csv'
 programs_defaultpath = 'programs'
 default_data_path = 'data'
 
@@ -22,7 +22,7 @@ default_data_path = 'data'
 address_powersupply = 'ASRL11::INSTR'
 address_multimeter = 'USB0::0x05E6::0x6500::04544803::INSTR'
 address_keysight = 'USB0::0x2A8D::0x5101::MY58018230::INSTR'
-# relaisboard_port = 'COM13'
+relaisboard_port = 'COM13'
 buffer_size = 10
 update_plot = 2  # sek
 
@@ -37,7 +37,7 @@ class Experiment():
         self.powersupply = PowerSupply(address_powersupply)
         print(Fore.GREEN + 'init ' + Fore.RESET + 'multimeter')
         # self.multimeter = Multimeter(address_multimeter)
-        self.multimeter_keysight = KeysightDAQ970a()
+        self.multimeter_keysight = KeysightDAQ970a(address_keysight)
         print(Fore.GREEN + 'init ' + Fore.RESET + 'relays')
         self.relaisboard = Relaisboard()
         print(Fore.GREEN + 'init ' + Fore.RESET + 'mfcs')
