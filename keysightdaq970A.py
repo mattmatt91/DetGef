@@ -3,10 +3,9 @@ import time
 
 
 class KeysightDAQ970a():
-    def __init__(self, address='TCPIP::169.254.6.147::5025::INSTR'):
+    def __init__(self, address='visa://K-DAQ970A-8230/ASRL1::INSTR'):
         rm = pyvisa.ResourceManager()
         print(rm.list_resources())
-        exit()
         self.client = rm.open_resource(address)
         self.aper_toggle = False
         self.aperture = 0.06
