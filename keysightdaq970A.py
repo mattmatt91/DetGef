@@ -3,12 +3,11 @@ import time
 
 
 class KeysightDAQ970a():
-    def __init__(self, address='TCPIP::K-DAQ970A-18230.local::5025::SOCKET'):
+    def __init__(self, address='TCPIP::169.254.6.147::5025::INSTR'):
         rm = pyvisa.ResourceManager()
         print(rm.list_resources())
-
+        exit()
         self.client = rm.open_resource(address)
-
         self.aper_toggle = False
         self.aperture = 0.06
         self.nplc = 1
@@ -16,9 +15,6 @@ class KeysightDAQ970a():
         self.client.read_termination = '\n'
         self.scanlist = "(@101) # ,102,103,104)"
         print(self.client.query("*IDN?"))
-        self.client.write("*RST")
-        self.client.write("*RST")
-        self.client.write("*RST")
         self.client.write("*RST")
         self.client.write(":SYSTem:BEEPer:STATe 0")
 
@@ -72,5 +68,4 @@ if __name__ == '__main__':
             print(keysightdaq970a.get_data())
             print(keysightdaq970a.get_errors())
             time.sleep(1)
-    print('exit')
     keysightdaq970a.close()
